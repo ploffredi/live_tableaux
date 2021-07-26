@@ -1,0 +1,14 @@
+<section class="phx-hero">
+  <h1><%= gettext "Welcome to the %{name}!", name: "Tableaux validator" %></h1>
+  <p>Please insert your sequent</p>
+
+  <form phx-change="suggest" phx-submit="validate">
+    <input type="text" name="q" value="<%= @query %>" placeholder="Sequent in the format     expr1,expr2,... exprN|=exprR     (Eg. p!q,!p|=q)" list="results" autocomplete="off"/>
+    <datalist id="results">
+      <%= for {app, _vsn} <- @results do %>
+        <option value="<%= app %>"><%= app %></option>
+      <% end %>
+    </datalist>
+    <button type="submit" phx-disable-with="Validating...">Validate</button>
+  </form>
+</section>
