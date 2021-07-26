@@ -8,7 +8,7 @@ defmodule LiveTableaux.Application do
   def start(_type, _args) do
     children = [
       # Start the Ecto repository
-      LiveTableaux.Repo,
+      # LiveTableaux.Repo,
       # Start the Telemetry supervisor
       LiveTableauxWeb.Telemetry,
       # Start the PubSub system

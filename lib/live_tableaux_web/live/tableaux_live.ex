@@ -7,23 +7,53 @@ defmodule LiveTableauxWeb.TableauxLive do
   end
 
   @impl true
-  @spec handle_event(<<_::56, _::_*8>>, map, Phoenix.LiveView.Socket.t()) :: {:noreply, any}
   def handle_event("suggest", %{"q" => query}, socket) do
     {:noreply, assign(socket, results: validate(query), query: query)}
   end
 
   @impl true
-  def handle_event("validate", %{"q" => query}, socket) do
-    case validate(query) do
-      %{^query => vsn} ->
-        {:noreply, redirect(socket, external: "https://hexdocs.pm/#{query}/#{vsn}")}
+  def handle_event("validate", _, socket) do
+    {:noreply,
+     push_event(socket, "updateResultTree", %{
+       name: "T[p|q]",
+       children: [
+         %{
+           name: "T[!p]",
+           children: [
+             %{
+               name: "F[q]",
+               children: [
+                 %{name: "T[p]", children: [%{name: "X"}]},
+                 %{name: "T[q]", children: [%{name: "X"}]}
+               ]
+             }
+           ]
+         }
+       ]
+     })}
+  end
 
-      _ ->
-        {:noreply,
-         socket
-         |> put_flash(:error, "No dependencies found matching \"#{query}\"")
-         |> assign(results: %{}, query: query)}
-    end
+
+  @impl true
+  def handle_info("update-tree", socket) do
+    {:noreply,
+     push_event(socket, "updateResultTree", %{
+       name: "T[p|q]",
+       children: [
+         %{
+           name: "T[!p]",
+           children: [
+             %{
+               name: "F[q]",
+               children: [
+                 %{name: "T[p]", children: [%{name: "X"}]},
+                 %{name: "T[q]", children: [%{name: "X"}]}
+               ]
+             }
+           ]
+         }
+       ]
+     })}
   end
 
   defp validate(query) do
