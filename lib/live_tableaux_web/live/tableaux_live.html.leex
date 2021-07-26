@@ -3,7 +3,7 @@
   <p>Please insert your sequent</p>
 
   <form phx-change="suggest" phx-submit="validate">
-    <input type="text" name="q" value="<%= @query %>" placeholder="Sequent in the format     expr1,expr2,... exprN|=exprR     (Eg. p!q,!p|=q)" list="results" autocomplete="off"/>
+    <input type="text" name="q" value="<%= @query %>" placeholder="Sequent in the format     expr1,expr2,... exprN|=exprR     (Eg. T[p|q,!p|=q])" list="results" autocomplete="off"/>
     <datalist id="results">
       <%= for {app, _vsn} <- @results do %>
         <option value="<%= app %>"><%= app %></option>
