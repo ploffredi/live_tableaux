@@ -17,7 +17,7 @@ defmodule LiveTableauxWeb.Router do
   scope "/", LiveTableauxWeb do
     pipe_through :browser
 
-    live "/", PageLive, :index
+    live "/", TableauxLive, :index
     live "/tableaux", TableauxLive, :index
   end
 
