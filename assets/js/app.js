@@ -82,27 +82,6 @@ Hooks.D3Tree = {
                   .text(function(d) { return d.data.name; });
 
     } );
-
-//    var treeData =
-//    {
-//      "name": "T[p|q]",
-//      "children": [
-//        {
-//            "name": "T[!p]",
-//          "children": [
-//            { "name": "F[q]" ,     "children": [
-//  
-//                                        { "name": "T[p]", "children": [ { "name": "X"}]  },
-//                                        { "name": "T[q]", "children": [ { "name": "X"}] }
-//  
-//                                  ]}
-//          ]
-//        }
-//      ]
-//    };
-//  
-  
-
   }
 }
 
