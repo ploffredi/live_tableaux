@@ -2,21 +2,18 @@
   <h1><%= gettext "Welcome to the %{name}!", name: "Tableaux validator" %></h1>
   <p>Please insert your sequent</p>
 
+  <div style="font-size:0.675em" >
+    Append an operator
+      <button style="background-color:white;color:blue;padding:8px;padding-top:0px;margin:2px" phx-click="add_not">&not;</button>
+      <button style="background-color:white;color:blue;padding:8px;padding-top:0px;margin:2px" phx-click="add_and">&and;</button>
+      <button style="background-color:white;color:blue;padding:8px;padding-top:0px;margin:2px" phx-click="add_or">&or;</button>
+      <button style="background-color:white;color:blue;padding:5px;padding-top:0px;margin:2px" phx-click="add_implies">&rarr;</button>
+  </div>
+
   <form phx-change="suggest" phx-submit="validate">
-    <div style="font-size:0.675em" >
-      Append an operator
-       <button style="background-color:white;color:blue;padding:8px;padding-top:0px;margin:2px" phx-click="add_not">&not;</button>
-       <button style="background-color:white;color:blue;padding:8px;padding-top:0px;margin:2px" phx-click="add_and">&and;</button>
-       <button style="background-color:white;color:blue;padding:8px;padding-top:0px;margin:2px" phx-click="add_or">&or;</button>
-       <button style="background-color:white;color:blue;padding:5px;padding-top:0px;margin:2px" phx-click="add_implies">&rarr;</button>
-    </div>
-    <input type="text" name="q" value="<%= @sequent %>" placeholder="Sequent in the format     expr1,expr2,... exprN|=exprR     (Eg. T p|q,!p|=q )" list="results" autocomplete="off"/>
-    <datalist id="results">
-      <%= for {app, _vsn} <- @results do %>
-        <option value="<%= app %>"><%= app %></option>
-      <% end %>
-    </datalist>
+
+    <input type="text" name="q" value="<%= @sequent %>" placeholder="Sequent in the format     expr1,expr2,... exprN|=exprR     (Eg. T p|q,!p|=q )" autocomplete="off"/>
     <button type="submit" phx-disable-with="Validating...">Validate</button>
   </form>
- <div id="d3-result" phx-hook="D3Tree">
+ <div id="d3-result" phx-hook="D3Tree" phx-update="ignore">
 </section>
