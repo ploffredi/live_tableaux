@@ -32,23 +32,23 @@ defmodule Tableaux do
     [%{value: expression, string: expression_to_string(expression), sign: :T} | add_signs(t)]
   end
 
-  def expression_to_string(atom) when is_atom(atom) do
+  defp expression_to_string(atom) when is_atom(atom) do
     "#{atom}"
   end
 
-  def expression_to_string({:negation, negated}) do
+  defp expression_to_string({:negation, negated}) do
     "¬#{expression_to_string(negated)}"
   end
 
-  def expression_to_string({:disjunction, left, right}) do
+  defp expression_to_string({:disjunction, left, right}) do
     "#{expression_to_string(left)}∨#{expression_to_string(right)}"
   end
 
-  def expression_to_string({:conjunction, left, right}) do
+  defp expression_to_string({:conjunction, left, right}) do
     "#{expression_to_string(left)}∧#{expression_to_string(right)}"
   end
 
-  def expression_to_string({:implication, left, right}) do
+  defp expression_to_string({:implication, left, right}) do
    "#{expression_to_string(left)}→#{expression_to_string(right)}"
   end
 
