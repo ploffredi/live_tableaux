@@ -18,16 +18,38 @@ defmodule Tableaux do
     %{string: expr, expression: expr |> ExpressionParser.parse()}
   end
 
+
   def parse_sequent(sequent) do
-    sequent|> String.split([",","|-"]) |> Enum.map(&String.trim/1) |> Enum.map(&parse_expression/1) |> add_signs()
+    SequentParser.parse(sequent) |> add_signs()
   end
 
-  defp add_signs([%{string: string, expression: expression}]) do
-    [%{value: expression, string: string, sign: :F}]
+
+  defp add_signs([expression]) do
+    [%{value: expression, string: expression_to_string(expression), sign: :F}]
   end
 
-  defp add_signs([%{string: string, expression: expression}|t]) do
-    [%{value: expression, string: string, sign: :T} | add_signs(t)]
+  defp add_signs([expression|t]) do
+    [%{value: expression, string: expression_to_string(expression), sign: :T} | add_signs(t)]
+  end
+
+  def expression_to_string(atom) when is_atom(atom) do
+    "#{atom}"
+  end
+
+  def expression_to_string({:negation, negated}) do
+    "¬#{expression_to_string(negated)}"
+  end
+
+  def expression_to_string({:disjunction, left, right}) do
+    "#{expression_to_string(left)}∨#{expression_to_string(right)}"
+  end
+
+  def expression_to_string({:conjunction, left, right}) do
+    "#{expression_to_string(left)}∧#{expression_to_string(right)}"
+  end
+
+  def expression_to_string({:implication, left, right}) do
+   "#{expression_to_string(left)}→#{expression_to_string(right)}"
   end
 
   def linear_branch_from_list([%{sign: sign, value: value, string: string}]) do
