@@ -53,7 +53,7 @@ defmodule Tableaux do
     add_alpha_rules(nil, parse_sequent(sequent))
   end
 
-  def parse_sequent(sequent) do
+  defp parse_sequent(sequent) do
     SequentParser.parse(sequent) |> add_signs()
   end
 
@@ -65,6 +65,35 @@ defmodule Tableaux do
     [%{value: expression, string: expression_to_string(expression), sign: :T} | add_signs(t)]
   end
 
+  @spec add_alpha_rules(nil | BinTree.t(), [
+          %{:sign => any, :string => any, :value => any, optional(any) => any},
+          ...
+        ]) :: BinTree.t()
+
+  @doc ~S"""
+  Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
+  need to create the first tree after the sequent parsing
+
+  ## Examples
+
+      iex> Tableaux.add_alpha_rules(nil, [%BinTree{value: :n1}, %BinTree{value: :n1}])
+      %BinTree{
+        checked: false,
+        left: %BinTree{
+          checked: false,
+          left: nil,
+          right: nil,
+          sign: nil,
+          string: nil,
+          value: :n1
+        },
+        right: nil,
+        sign: nil,
+        string: nil,
+        value: :n1
+      }
+
+  """
   def add_alpha_rules(nil, list) do
     BinTree.linear_branch_from_list(list)
   end
@@ -92,6 +121,93 @@ defmodule Tableaux do
         }
   end
 
+  @spec add_beta_rules(
+          BinTree.t(),
+          %{:sign => any, :string => any, :value => any, optional(any) => any},
+          %{:sign => any, :string => any, :value => any, optional(any) => any}
+        ) :: BinTree.t()
+  @doc ~S"""
+  Apply a beta rules from tableaux to all the leaf nodes of a tree.
+
+  ## Examples
+      iex> Tableaux.add_beta_rules(%BinTree{value: :root}, %BinTree{value: :l1_left}, %BinTree{value: :l1_right})
+      %BinTree{
+        checked: nil,
+        left: %BinTree{
+          checked: false,
+          left: nil,
+          right: nil,
+          sign: nil,
+          string: nil,
+          value: :l1_left
+        },
+        right: %BinTree{
+          checked: false,
+          left: nil,
+          right: nil,
+          sign: nil,
+          string: nil,
+          value: :l1_right
+        },
+        sign: nil,
+        string: nil,
+        value: :root
+      }
+
+
+      iex> Tableaux.add_beta_rules(%BinTree{value: :root, left: %BinTree{value: :l1_left}, right: %BinTree{value: :l1_right}}, %BinTree{value: :l2_left}, %BinTree{value: :l2_right})
+      %BinTree{
+        checked: nil,
+        left: %BinTree{
+          checked: nil,
+          left: %BinTree{
+            checked: false,
+            left: nil,
+            right: nil,
+            sign: nil,
+            string: nil,
+            value: :l2_left
+          },
+          right: %BinTree{
+            checked: false,
+            left: nil,
+            right: nil,
+            sign: nil,
+            string: nil,
+            value: :l2_right
+          },
+          sign: nil,
+          string: nil,
+          value: :l1_left
+        },
+        right: %BinTree{
+          checked: nil,
+          left: %BinTree{
+            checked: false,
+            left: nil,
+            right: nil,
+            sign: nil,
+            string: nil,
+            value: :l2_left
+          },
+          right: %BinTree{
+            checked: false,
+            left: nil,
+            right: nil,
+            sign: nil,
+            string: nil,
+            value: :l2_right
+          },
+          sign: nil,
+          string: nil,
+          value: :l1_right
+        },
+        sign: nil,
+        string: nil,
+        value: :root
+      }
+
+  """
   def add_beta_rules(%BinTree{left: nil, right: nil}=tree, %{sign: lsign, value: lexp, string: lstr} , %{sign: rsign, value: rexp, string: lstr}) do
     %BinTree{tree | left: %BinTree{value: lexp, sign: lsign, string: lstr, checked: false}, right: %BinTree{value: rexp, sign: rsign, string: lstr, checked: false}}
   end
