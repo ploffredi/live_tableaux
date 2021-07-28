@@ -1,7 +1,5 @@
-defmodule DocTests do
+defmodule TableauxTest do
   use ExUnit.Case, async: true
-
-  import Tableaux
 
   doctest Tableaux
 end
