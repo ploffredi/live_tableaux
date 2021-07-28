@@ -36,21 +36,64 @@ defmodule Tableaux do
     "#{atom}"
   end
 
-  defp expression_to_string({:negation, negated}) do
+  defp expression_to_string({:negation, negated}) when is_atom(negated) do
     "¬#{expression_to_string(negated)}"
   end
 
-  defp expression_to_string({:disjunction, left, right}) do
+  defp expression_to_string({:negation, negated}) do
+    "¬(#{expression_to_string(negated)})"
+  end
+
+  defp expression_to_string({:disjunction, left, right}) when is_atom(left) and is_atom(right) do
     "#{expression_to_string(left)}∨#{expression_to_string(right)}"
   end
 
-  defp expression_to_string({:conjunction, left, right}) do
+  defp expression_to_string({:conjunction, left, right}) when is_atom(left)  and is_atom(right) do
     "#{expression_to_string(left)}∧#{expression_to_string(right)}"
   end
 
-  defp expression_to_string({:implication, left, right}) do
+  defp expression_to_string({:implication, left, right}) when is_atom(left) and is_atom(right) do
    "#{expression_to_string(left)}→#{expression_to_string(right)}"
   end
+
+  defp expression_to_string({:disjunction, left, right}) when is_atom(left) do
+    "#{expression_to_string(left)}∨(#{expression_to_string(right)})"
+  end
+
+  defp expression_to_string({:conjunction, left, right}) when is_atom(left) do
+    "#{expression_to_string(left)}∧(#{expression_to_string(right)})"
+  end
+
+  defp expression_to_string({:implication, left, right}) when is_atom(left) do
+   "#{expression_to_string(left)}→(#{expression_to_string(right)})"
+  end
+
+  defp expression_to_string({:disjunction, left, right}) when is_atom(right) do
+    "(#{expression_to_string(left)})∨#{expression_to_string(right)}"
+  end
+
+  defp expression_to_string({:conjunction, left, right}) when is_atom(right) do
+    "(#{expression_to_string(left)})∧#{expression_to_string(right)}"
+  end
+
+  defp expression_to_string({:implication, left, right}) when is_atom(right) do
+   "(#{expression_to_string(left)})→#{expression_to_string(right)}"
+  end
+
+
+  defp expression_to_string({:disjunction, left, right}) do
+    "(#{expression_to_string(left)}∨#{expression_to_string(right)})"
+  end
+
+  defp expression_to_string({:conjunction, left, right}) do
+    "(#{expression_to_string(left)}∧#{expression_to_string(right)})"
+  end
+
+  defp expression_to_string({:implication, left, right}) do
+   "(#{expression_to_string(left)}→#{expression_to_string(right)})"
+  end
+
+
 
   def linear_branch_from_list([%{sign: sign, value: value, string: string}]) do
     %BinTree{value: value, sign: sign, string: string, checked: false}
