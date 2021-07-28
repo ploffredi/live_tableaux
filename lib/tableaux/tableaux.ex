@@ -17,7 +17,36 @@ defmodule Tableaux do
   ## Examples
 
       iex> Tableaux.from_sequent("!(a|(b&c))>c,b|c,b|-c")
-      ("T (¬(a∨(b∧c)))→c":("T b∨c":("T b":("F c"::):):):)
+      %BinTree{
+        checked: false,
+        left: %BinTree{
+          checked: false,
+          left: %BinTree{
+            checked: false,
+            left: %BinTree{
+              checked: false,
+              left: nil,
+              right: nil,
+              sign: :F,
+              string: "c",
+              value: :c
+            },
+            right: nil,
+            sign: :T,
+            string: "b",
+            value: :b
+          },
+          right: nil,
+          sign: :T,
+          string: "b∨c",
+          value: {:disjunction, :b, :c}
+        },
+        right: nil,
+        sign: :T,
+        string: "(¬(a∨(b∧c)))→c",
+        value: {:implication, {:negation, {:disjunction, :a, {:conjunction, :b, :c}}},
+        :c}
+      }
 
   """
   def from_sequent(sequent) do
