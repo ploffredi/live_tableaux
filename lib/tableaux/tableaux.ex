@@ -10,6 +10,16 @@ defmodule Tableaux do
     from_sequent(sequent)
   end
 
+  @spec from_sequent(binary) :: BinTree.t()
+  @doc ~S"""
+  Parses the given `sequent` into a binary tree.
+
+  ## Examples
+
+      iex> Tableaux.from_sequent("!(a|(b&c))>c,b|c,b|-c")
+      ("T (¬(a∨(b∧c)))→c":("T b∨c":("T b":("F c"::):):):)
+
+  """
   def from_sequent(sequent) do
     add_alpha_rules(nil, parse_sequent(sequent))
   end
