@@ -1,4 +1,4 @@
-defmodule Expression do
+defmodule Expressions do
   def expression_to_string(atom) when is_atom(atom) do
     "#{atom}"
   end

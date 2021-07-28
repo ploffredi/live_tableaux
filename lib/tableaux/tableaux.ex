@@ -3,7 +3,7 @@ defmodule Tableaux do
   Documentation for `Tableaux`.
   """
 
-  import Expression
+
   alias BinTree
 
   def verify(sequent) do
@@ -13,118 +13,19 @@ defmodule Tableaux do
     expand(first_tree, %{to_apply: signed_expressions_list, applied: []})
   end
 
-  defp compare_operators(first, second) do
-    case first do
-      :atom ->
-        case second do
-          :atom -> false
-          :alpha -> false
-          :beta -> false
-        end
-      :alpha ->
-        case second do
-          :atom -> true
-          :alpha -> false
-          :beta -> true
-        end
-      :beta ->
-          case second do
-            :atom -> true
-            :alpha -> false
-            :beta -> false
-          end
-    end
-  end
 
-  defp get_rule_type(:T, :negation), do: :alpha
-
-  defp get_rule_type(:F, :negation) , do: :alpha
-
-  defp get_rule_type(:T, :implication), do: :beta
-
-  defp get_rule_type(:F, :implication), do: :alpha
-
-  defp get_rule_type(:T, :conjunction), do: :alpha
-
-  defp get_rule_type(:F, :conjunction), do: :beta
-
-  defp get_rule_type(:T, :disjunction), do: :beta
-
-  defp get_rule_type(:F, :disjunction), do: :alpha
-
-  defp get_rule_type(:T, :atom), do: :atom
-
-  defp get_rule_type(:F, :atom), do: :atom
-
-  def expand(tree, %{to_apply: to_apply, applied: applied} ) do
+  def expand(_tree, %{to_apply: to_apply, applied: _applied} ) do
     to_expand=to_apply|>Enum.sort_by(fn
-      %{sign: sign , string: _, value: {operator, _, _}} -> get_rule_type(sign, operator)
-      %{sign: sign, string: _, value: {operator, _}} -> get_rule_type(sign, operator)
-      %{sign: sign, string: _, value: atom} when is_atom(atom) -> get_rule_type(sign, :atom)
-     end ,&compare_operators(&1, &2))|>Enum.at(0)
+      %{sign: sign , string: _, value: {operator, _, _}} -> TableauxRules.get_rule_type(sign, operator)
+      %{sign: sign, string: _, value: {operator, _}} -> TableauxRules.get_rule_type(sign, operator)
+      %{sign: sign, string: _, value: atom} when is_atom(atom) -> TableauxRules.get_rule_type(sign, :atom)
+     end ,&TableauxRules.compare_operators(&1, &2))|>Enum.at(0)
 
-     expanding_rule(to_expand)
+     TableauxRules.get_rule_expansion(to_expand)
 
   end
 
-  defp expanding_rule(%{sign: :F , value: {:conjunction, expr1, expr2}}) do
-    {:ok, get_rule_type(:F, :conjunction),
-      [
-        %{sign: :F, string: Expression.expression_to_string(expr1), value: expr1},
-        %{sign: :F, string: Expression.expression_to_string(expr2), value: expr2},
-      ]
-    }
-  end
 
-
-  defp expanding_rule(%{sign: :T , value: {:implication, expr1, expr2}}) do
-    {:ok, get_rule_type(:T, :implication),
-      [
-        %{sign: :F, string: Expression.expression_to_string(expr1), value: expr1},
-        %{sign: :T, string: Expression.expression_to_string(expr2), value: expr2},
-      ]
-    }
-  end
-
-  defp expanding_rule(%{sign: :T , value: {:disjunction, expr1, expr2}}) do
-    {:ok, get_rule_type(:T, :disjunction),
-      [
-        %{sign: :T, string: Expression.expression_to_string(expr1), value: expr1},
-        %{sign: :T, string: Expression.expression_to_string(expr2), value: expr2},
-      ]
-    }
-  end
-
-  defp expanding_rule(%{sign: :F , value: {:implication, expr1, expr2}}) do
-    {:ok, get_rule_type(:F, :implication),
-      [
-        %{sign: :T, string: Expression.expression_to_string(expr1), value: expr1},
-        %{sign: :F, string: Expression.expression_to_string(expr2), value: expr2},
-      ]
-    }
-  end
-
-  defp expanding_rule(%{sign: :F , value: {:disjunction, expr1, expr2}}) do
-    {:ok, get_rule_type(:F, :disjunction),
-      [
-        %{sign: :F, string: Expression.expression_to_string(expr1), value: expr1},
-        %{sign: :F, string: Expression.expression_to_string(expr2), value: expr2},
-      ]
-    }
-  end
-
-  defp expanding_rule(%{sign: :T , value: {:conjunction, expr1, expr2}}) do
-    {:ok, get_rule_type(:T, :conjunction),
-      [
-        %{sign: :T, string: Expression.expression_to_string(expr1), value: expr1},
-        %{sign: :T, string: Expression.expression_to_string(expr2), value: expr2},
-      ]
-    }
-  end
-
-  defp expanding_rule(%{sign: :F , string: _, value: {:negation, expr}}) do
-    {:ok, get_rule_type(:F, :negation), [%{sign: :T, string: Expression.expression_to_string(expr), value: expr}]}
-  end
 
   @spec from_sequent(binary) :: BinTree.t()
   @doc ~S"""
@@ -174,11 +75,11 @@ defmodule Tableaux do
   end
 
   def add_signs([expression]) do
-    [%{value: expression, string: expression_to_string(expression), sign: :F}]
+    [%{value: expression, string: Expressions.expression_to_string(expression), sign: :F}]
   end
 
   def add_signs([expression|t]) do
-    [%{value: expression, string: expression_to_string(expression), sign: :T} | add_signs(t)]
+    [%{value: expression, string: Expressions.expression_to_string(expression), sign: :T} | add_signs(t)]
   end
 
   @spec add_alpha_rules(nil | BinTree.t(), [
