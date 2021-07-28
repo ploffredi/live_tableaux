@@ -6,22 +6,17 @@ defmodule Tableaux do
   import Expression
   alias BinTree
 
-
   def verify(sequent) do
-    add_alpha_rules(nil, parse_sequent(sequent))
+    from_sequent(sequent)
   end
 
   def from_sequent(sequent) do
     add_alpha_rules(nil, parse_sequent(sequent))
   end
 
-
-
-
   def parse_sequent(sequent) do
     SequentParser.parse(sequent) |> add_signs()
   end
-
 
   defp add_signs([expression]) do
     [%{value: expression, string: expression_to_string(expression), sign: :F}]
@@ -31,14 +26,9 @@ defmodule Tableaux do
     [%{value: expression, string: expression_to_string(expression), sign: :T} | add_signs(t)]
   end
 
-
-
-
-
   def add_alpha_rules(nil, list) do
     BinTree.linear_branch_from_list(list)
   end
-
 
   def add_alpha_rules(%BinTree{left: nil, right: nil}=tree, list) do
     %BinTree{tree | left: BinTree.linear_branch_from_list(list)}
@@ -85,6 +75,4 @@ defmodule Tableaux do
           right: add_beta_rules(right, lexp, rexp)
         }
   end
-
-
 end
