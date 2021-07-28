@@ -7,9 +7,9 @@ defmodule BinTree do
   `right` is the right subtree (nil if no subtree).
   """
 
-  @type t :: %BinTree{value: any, left: t() | nil, right: t() | nil , checked: boolean(), sign: :T|:F, string: binary()}
+  @type t :: %BinTree{value: any, left: t() | nil, right: t() | nil , checked: boolean(), sign: :T|:F, string: binary(), nid: binary()}
 
-  defstruct [:value, :left, :right, :checked, :sign, :string]
+  defstruct [:value, :left, :right, :checked, :sign, :string, nid: UUID.uuid1()]
 
   def to_map(%BinTree{string: string, sign: sign, left: nil, right: nil}) do
     %{name: "#{sign} #{string}", children: []}
