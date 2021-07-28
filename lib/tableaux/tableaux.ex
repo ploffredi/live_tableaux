@@ -3,8 +3,9 @@ defmodule Tableaux do
   Documentation for `Tableaux`.
   """
 
+  import Expression
   alias BinTree
-  alias ExpressionParser
+
 
   def verify(sequent) do
     add_alpha_rules(nil, parse_sequent(sequent))
@@ -14,9 +15,7 @@ defmodule Tableaux do
     add_alpha_rules(nil, parse_sequent(sequent))
   end
 
-  def parse_expression(expr) do
-    %{string: expr, expression: expr |> ExpressionParser.parse()}
-  end
+
 
 
   def parse_sequent(sequent) do
@@ -32,84 +31,17 @@ defmodule Tableaux do
     [%{value: expression, string: expression_to_string(expression), sign: :T} | add_signs(t)]
   end
 
-  defp expression_to_string(atom) when is_atom(atom) do
-    "#{atom}"
-  end
-
-  defp expression_to_string({:negation, negated}) when is_atom(negated) do
-    "¬#{expression_to_string(negated)}"
-  end
-
-  defp expression_to_string({:negation, negated}) do
-    "¬(#{expression_to_string(negated)})"
-  end
-
-  defp expression_to_string({:disjunction, left, right}) when is_atom(left) and is_atom(right) do
-    "#{expression_to_string(left)}∨#{expression_to_string(right)}"
-  end
-
-  defp expression_to_string({:conjunction, left, right}) when is_atom(left)  and is_atom(right) do
-    "#{expression_to_string(left)}∧#{expression_to_string(right)}"
-  end
-
-  defp expression_to_string({:implication, left, right}) when is_atom(left) and is_atom(right) do
-   "#{expression_to_string(left)}→#{expression_to_string(right)}"
-  end
-
-  defp expression_to_string({:disjunction, left, right}) when is_atom(left) do
-    "#{expression_to_string(left)}∨(#{expression_to_string(right)})"
-  end
-
-  defp expression_to_string({:conjunction, left, right}) when is_atom(left) do
-    "#{expression_to_string(left)}∧(#{expression_to_string(right)})"
-  end
-
-  defp expression_to_string({:implication, left, right}) when is_atom(left) do
-   "#{expression_to_string(left)}→(#{expression_to_string(right)})"
-  end
-
-  defp expression_to_string({:disjunction, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})∨#{expression_to_string(right)}"
-  end
-
-  defp expression_to_string({:conjunction, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})∧#{expression_to_string(right)}"
-  end
-
-  defp expression_to_string({:implication, left, right}) when is_atom(right) do
-   "(#{expression_to_string(left)})→#{expression_to_string(right)}"
-  end
-
-
-  defp expression_to_string({:disjunction, left, right}) do
-    "(#{expression_to_string(left)}∨#{expression_to_string(right)})"
-  end
-
-  defp expression_to_string({:conjunction, left, right}) do
-    "(#{expression_to_string(left)}∧#{expression_to_string(right)})"
-  end
-
-  defp expression_to_string({:implication, left, right}) do
-   "(#{expression_to_string(left)}→#{expression_to_string(right)})"
-  end
 
 
 
-  def linear_branch_from_list([%{sign: sign, value: value, string: string}]) do
-    %BinTree{value: value, sign: sign, string: string, checked: false}
-  end
-
-  def linear_branch_from_list([%{sign: sign, value: value, string: string}|t]) do
-    %BinTree{value: value, sign: sign, string: string, checked: false, left: linear_branch_from_list(t)}
-  end
 
   def add_alpha_rules(nil, list) do
-    linear_branch_from_list(list)
+    BinTree.linear_branch_from_list(list)
   end
 
 
   def add_alpha_rules(%BinTree{left: nil, right: nil}=tree, list) do
-    %BinTree{tree | left: linear_branch_from_list(list)}
+    %BinTree{tree | left: BinTree.linear_branch_from_list(list)}
   end
 
   def add_alpha_rules(%BinTree{left: nil, right: right}=tree, list) do

@@ -27,6 +27,15 @@ defmodule BinTree do
   end
 
 
+  def linear_branch_from_list([%{sign: sign, value: value, string: string}]) do
+    %BinTree{value: value, sign: sign, string: string, checked: false}
+  end
+
+  def linear_branch_from_list([%{sign: sign, value: value, string: string}|t]) do
+    %BinTree{value: value, sign: sign, string: string, checked: false, left: linear_branch_from_list(t)}
+  end
+
+
 end
 
 defimpl Inspect, for: BinTree do
