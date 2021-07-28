@@ -76,6 +76,8 @@ defmodule Tableaux do
 
   ## Examples
 
+      apply the alpha rule to an empty tree creates a tree with only left branches in all nodes
+
       iex> Tableaux.add_alpha_rules(nil, [%BinTree{value: :n1}, %BinTree{value: :n1}])
       %BinTree{
         checked: false,
@@ -130,6 +132,9 @@ defmodule Tableaux do
   Apply a beta rules from tableaux to all the leaf nodes of a tree.
 
   ## Examples
+
+      apply beta rules to a tree which have only one root node
+
       iex> Tableaux.add_beta_rules(%BinTree{value: :root}, %BinTree{value: :l1_left}, %BinTree{value: :l1_right})
       %BinTree{
         checked: nil,
@@ -154,6 +159,7 @@ defmodule Tableaux do
         value: :root
       }
 
+      apply beta rules to a tree with two leaf on the first layer
 
       iex> Tableaux.add_beta_rules(%BinTree{value: :root, left: %BinTree{value: :l1_left}, right: %BinTree{value: :l1_right}}, %BinTree{value: :l2_left}, %BinTree{value: :l2_right})
       %BinTree{
