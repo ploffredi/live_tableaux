@@ -14,5 +14,10 @@
     <input type="text" name="q" value="<%= @sequent %>" placeholder="Sequent in the format     expr1,expr2,... exprN|-exprR     (Eg. p|q,!p|-q )" autocomplete="off"/>
     <button type="submit" phx-disable-with="Validating...">Validate</button>
   </form>
+
+  <form phx-change="suggest" phx-submit="expand">
+    <input type="hidden" name="q" value="<%= @sequent %>" placeholder="Sequent in the format     expr1,expr2,... exprN|-exprR     (Eg. p|q,!p|-q )" autocomplete="off"/>
+    <button  type="submit" phx-disable-with="Validating...">Expand sequent (test)</button>
+  </form>
  <div id="d3-result" phx-hook="D3Tree" phx-update="ignore">
 </section>
