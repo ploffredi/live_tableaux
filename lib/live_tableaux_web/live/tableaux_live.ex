@@ -33,24 +33,9 @@ defmodule LiveTableauxWeb.TableauxLive do
   end
 
   @impl true
-  def handle_event("validate", _, socket) do
+  def handle_event("validate", %{"q" => sequent}, socket) do
+
     {:noreply,
-     push_event(socket, "updateResultTree", %{
-       name: "T[p|q]",
-       children: [
-         %{
-           name: "T[!p]",
-           children: [
-             %{
-               name: "F[q]",
-               children: [
-                 %{name: "T[p]", children: [%{name: "X"}]},
-                 %{name: "T[q]", children: [%{name: "X"}]}
-               ]
-             }
-           ]
-         }
-       ]
-     })}
+     push_event(socket, "updateResultTree", Tableaux.from_sequent(sequent)|>BinTree.to_map() )}
   end
 end
