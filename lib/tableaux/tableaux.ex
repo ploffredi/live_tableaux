@@ -35,6 +35,8 @@ defmodule Tableaux do
   end
 
   def verify(sequent) do
+    UniqueCounter.reset()
+
     signed_expressions_list = SequentParser.parse(sequent) |> add_signs(0)
     first_tree = add_alpha_rules(nil, signed_expressions_list, nil, false)
     expand(first_tree, signed_expressions_list, [])
@@ -64,25 +66,17 @@ defmodule Tableaux do
 
     expansion = TableauxRules.get_rule_expansion(to_expand)
 
-    # IO.inspect(to_apply|>Enum.map(&("#{&1.source} -> #{&1.nid} #{&1.sign} #{&1.string}")))
-
-    # IO.inspect(expansion.rule_type )
-    # IO.inspect(to_expand.string)
-    # IO.inspect(to_expand.nid)
-    # IO.inspect(tree)
     case expansion.rule_type do
       :alpha ->
         add_alpha_rules(tree, expansion.expanded_nodes, to_expand.nid, false)
-        |> expand(rest ++ expansion.expanded_nodes, [to_expand | applied])
 
       :beta ->
         add_beta_rules_list(tree, expansion.expanded_nodes, to_expand.nid)
-        |> expand(rest ++ expansion.expanded_nodes, [to_expand | applied])
 
       :atom ->
         add_alpha_rules(tree, expansion.expanded_nodes, to_expand.nid, false)
-        |> expand(rest, [to_expand | applied])
     end
+    |> expand(rest ++ expansion.expanded_nodes, [to_expand | applied])
   end
 
   @spec from_sequent(binary) :: BinTree.t()
@@ -189,7 +183,6 @@ defmodule Tableaux do
               value: lexp,
               sign: lsign,
               string: lstr,
-              checked: false,
               nid: lnid,
               source: lsource
             },
@@ -197,7 +190,6 @@ defmodule Tableaux do
               value: rexp,
               sign: rsign,
               string: rstr,
-              checked: false,
               nid: rnid,
               source: rsource
             }

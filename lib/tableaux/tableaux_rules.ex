@@ -48,7 +48,7 @@ defmodule TableauxRules do
         sign: :F,
         string: _,
         expression: atom,
-        nid: nid
+        nid: _nid
       })
       when is_atom(atom),
       do: %RuleExpansion{
@@ -60,7 +60,7 @@ defmodule TableauxRules do
         sign: :T,
         string: _,
         expression: atom,
-        nid: nid
+        nid: _nid
       })
       when is_atom(atom),
       do: %RuleExpansion{

@@ -11,14 +11,13 @@ defmodule BinTree do
           value: any,
           left: t() | nil,
           right: t() | nil,
-          checked: boolean(),
           sign: :T | :F,
           string: binary(),
           nid: binary(),
           source: binary()
         }
 
-  defstruct [:value, :left, :right, :checked, :sign, :string, nid: nil, source: nil]
+  defstruct [:value, :left, :right, :sign, :string, nid: nil, source: nil]
 
   def to_map(%BinTree{string: string, sign: sign, left: nil, right: nil, nid: nid, source: source}) do
     %{name: "#{sign} #{string}  (#{source}->#{nid})", children: []}
@@ -58,31 +57,24 @@ defmodule BinTree do
   end
 
   @spec linear_branch_from_list([RuleNode.t()]) :: BinTree.t()
-
-  @spec linear_branch_from_list([RuleNode.t()]) :: BinTree.t()
-  def linear_branch_from_list([]) do
-    nil
-  end
+  def linear_branch_from_list([]), do: nil
 
   def linear_branch_from_list([
         %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source}
-      ]) do
-    %BinTree{value: value, sign: sign, string: string, checked: false, nid: nid, source: source}
-  end
+      ]),
+      do: %BinTree{value: value, sign: sign, string: string, nid: nid, source: source}
 
   def linear_branch_from_list([
         %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source} | t
-      ]) do
-    %BinTree{
-      value: value,
-      sign: sign,
-      string: string,
-      checked: false,
-      left: linear_branch_from_list(t),
-      nid: nid,
-      source: source
-    }
-  end
+      ]),
+      do: %BinTree{
+        value: value,
+        sign: sign,
+        string: string,
+        left: linear_branch_from_list(t),
+        nid: nid,
+        source: source
+      }
 end
 
 # defimpl Inspect, for: BinTree do
