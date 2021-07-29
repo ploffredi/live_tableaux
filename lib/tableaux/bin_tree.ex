@@ -14,58 +14,93 @@ defmodule BinTree do
           checked: boolean(),
           sign: :T | :F,
           string: binary(),
-          nid: binary()
+          nid: binary(),
+          source: binary()
         }
 
-  defstruct [:value, :left, :right, :checked, :sign, :string, nid: UUID.uuid1()]
+  defstruct [:value, :left, :right, :checked, :sign, :string, nid: nil, source: nil]
 
-  def to_map(%BinTree{string: string, sign: sign, left: nil, right: nil}) do
-    %{name: "#{sign} #{string}", children: []}
+  def to_map(%BinTree{string: string, sign: sign, left: nil, right: nil, nid: nid, source: source}) do
+    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: []}
   end
 
-  def to_map(%BinTree{string: string, sign: sign, left: left, right: nil}) do
-    %{name: "#{sign} #{string}", children: [to_map(left)]}
+  def to_map(%BinTree{
+        string: string,
+        sign: sign,
+        left: left,
+        right: nil,
+        nid: nid,
+        source: source
+      }) do
+    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: [to_map(left)]}
   end
 
-  def to_map(%BinTree{string: string, sign: sign, left: nil, right: right}) do
-    %{name: "#{sign} #{string}", children: [to_map(right)]}
+  def to_map(%BinTree{
+        string: string,
+        sign: sign,
+        left: nil,
+        right: right,
+        nid: nid,
+        source: source
+      }) do
+    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: [to_map(right)]}
   end
 
-  def to_map(%BinTree{string: string, sign: sign, left: left, right: right}) do
-    %{name: "#{sign} #{string}", children: [to_map(left), to_map(right)]}
+  def to_map(%BinTree{
+        string: string,
+        sign: sign,
+        left: left,
+        right: right,
+        nid: nid,
+        source: source
+      }) do
+    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: [to_map(left), to_map(right)]}
   end
 
-  def linear_branch_from_list([%{sign: sign, value: value, string: string}]) do
-    %BinTree{value: value, sign: sign, string: string, checked: false}
+  @spec linear_branch_from_list([RuleNode.t()]) :: BinTree.t()
+
+  @spec linear_branch_from_list([RuleNode.t()]) :: BinTree.t()
+  def linear_branch_from_list([]) do
+    nil
   end
 
-  def linear_branch_from_list([%{sign: sign, value: value, string: string} | t]) do
+  def linear_branch_from_list([
+        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source}
+      ]) do
+    %BinTree{value: value, sign: sign, string: string, checked: false, nid: nid, source: source}
+  end
+
+  def linear_branch_from_list([
+        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source} | t
+      ]) do
     %BinTree{
       value: value,
       sign: sign,
       string: string,
       checked: false,
-      left: linear_branch_from_list(t)
+      left: linear_branch_from_list(t),
+      nid: nid,
+      source: source
     }
   end
 end
 
-defimpl Inspect, for: BinTree do
-  import Inspect.Algebra
-
-  # A custom inspect instance purely for the tests, this makes error messages
-  # much more readable.
-  #
-  # BinTree[value: 3, left: BinTree[value: 5, right: BinTree[value: 6]]] becomes (3:(5::(6::)):)
-  def inspect(%BinTree{string: value, sign: sign, left: left, right: right}, opts) do
-    concat([
-      "(",
-      to_doc("#{sign} #{value}", opts),
-      ":",
-      if(left, do: to_doc(left, opts), else: ""),
-      ":",
-      if(right, do: to_doc(right, opts), else: ""),
-      ")"
-    ])
-  end
-end
+# defimpl Inspect, for: BinTree do
+#  import Inspect.Algebra
+#
+#  # A custom inspect instance purely for the tests, this makes error messages
+#  # much more readable.
+#  #
+#  # BinTree[value: 3, left: BinTree[value: 5, right: BinTree[value: 6]]] becomes (3:(5::(6::)):)
+#  def inspect(%BinTree{string: value, sign: sign, left: left, right: right}, opts) do
+#    concat([
+#      "(",
+#      to_doc("#{sign} #{value}", opts),
+#      ":",
+#      if(left, do: to_doc(left, opts), else: ""),
+#      ":",
+#      if(right, do: to_doc(right, opts), else: ""),
+#      ")"
+#    ])
+#  end
+# end
