@@ -11,49 +11,49 @@ defmodule Expressions do
     "¬(#{expression_to_string(negated)})"
   end
 
-  def expression_to_string({:disjunction, left, right}) when is_atom(left) and is_atom(right) do
-    "#{expression_to_string(left)}∨#{expression_to_string(right)}"
-  end
+
 
   def expression_to_string({:conjunction, left, right}) when is_atom(left) and is_atom(right) do
     "#{expression_to_string(left)}∧#{expression_to_string(right)}"
   end
-
-  def expression_to_string({:implication, left, right}) when is_atom(left) and is_atom(right) do
-    "#{expression_to_string(left)}→#{expression_to_string(right)}"
+  def expression_to_string({:conjunction, left, right}) when is_atom(left) do
+    "#{expression_to_string(left)}∧(#{expression_to_string(right)})"
   end
-
+  def expression_to_string({:conjunction, left, right}) when is_atom(right) do
+    "(#{expression_to_string(left)}∧#{expression_to_string(right)})"
+  end
+  def expression_to_string({:disjunction, left, right}) when is_atom(left) and is_atom(right) do
+    "#{expression_to_string(left)}∨#{expression_to_string(right)}"
+  end
   def expression_to_string({:disjunction, left, right}) when is_atom(left) do
     "#{expression_to_string(left)}∨(#{expression_to_string(right)})"
   end
 
-  def expression_to_string({:conjunction, left, right}) when is_atom(left) do
-    "#{expression_to_string(left)}∧(#{expression_to_string(right)})"
+  def expression_to_string({:disjunction, left, right}) when is_atom(right) do
+    "(#{expression_to_string(left)}∨#{expression_to_string(right)})"
   end
 
   def expression_to_string({:implication, left, right}) when is_atom(left) do
     "#{expression_to_string(left)}→(#{expression_to_string(right)})"
   end
 
-  def expression_to_string({:disjunction, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})∨#{expression_to_string(right)}"
-  end
-
-  def expression_to_string({:conjunction, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})∧#{expression_to_string(right)}"
+  def expression_to_string({:implication, left, right}) when is_atom(left) and is_atom(right) do
+    "#{expression_to_string(left)}→#{expression_to_string(right)}"
   end
 
   def expression_to_string({:implication, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})→#{expression_to_string(right)}"
+    "(#{expression_to_string(left)}→#{expression_to_string(right)})"
+  end
+
+  def expression_to_string({:conjunction, left, right}) do
+    "(#{expression_to_string(left)}∧#{expression_to_string(right)})"
   end
 
   def expression_to_string({:disjunction, left, right}) do
     "(#{expression_to_string(left)}∨#{expression_to_string(right)})"
   end
 
-  def expression_to_string({:conjunction, left, right}) do
-    "(#{expression_to_string(left)}∧#{expression_to_string(right)})"
-  end
+
 
   def expression_to_string({:implication, left, right}) do
     "(#{expression_to_string(left)}→#{expression_to_string(right)})"
