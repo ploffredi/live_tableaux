@@ -7,37 +7,38 @@ defmodule Tableaux do
           [
             any
           ],
-          any
+          any,
+          integer()
+
         ) :: [RuleNode.t(), ...]
-  def add_signs([expression], step) do
+  def add_signs([expression], step, idx) do
     [
       %RuleNode{
-        RuleNode.empty_with_nid()
-        | expression: expression,
+        expression: expression,
           string: Expressions.expression_to_string(expression),
           sign: :F,
-          step: step
+          step: step,
+          nid: idx
       }
     ]
   end
 
-  def add_signs([expression | t], step) do
+  def add_signs([expression | t], step, idx) do
     [
       %RuleNode{
-        RuleNode.empty_with_nid()
-        | expression: expression,
+        expression: expression,
           string: Expressions.expression_to_string(expression),
           sign: :T,
-          step: step
+          step: step,
+          nid: idx
       }
-      | add_signs(t, step)
+      | add_signs(t, step, idx+1)
     ]
   end
 
   def verify(sequent) do
-    UniqueCounter.reset()
 
-    signed_expressions_list = SequentParser.parse(sequent) |> add_signs(0)
+    signed_expressions_list = SequentParser.parse(sequent) |> add_signs(0,1)
     first_tree = add_alpha_rules(nil, signed_expressions_list, nil, false)
     expand(first_tree, signed_expressions_list, [])
   end
@@ -55,19 +56,7 @@ defmodule Tableaux do
         &TableauxRules.compare_operators(&1, &2)
       )
 
-    rest
-    |> Enum.map(&"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]")
-    |> IO.inspect(label: "to apply")
-
-    IO.inspect("#{to_expand.sign} #{to_expand.string} [#{to_expand.source},#{to_expand.nid}]",
-      label: "to expand"
-    )
-
-    IO.inspect(to_expand, label: "to expand")
-
-    expansion = TableauxRules.get_rule_expansion(to_expand)
-
-    IO.inspect(expansion, label: "rule expansion")
+    expansion = TableauxRules.get_rule_expansion(to_expand, Enum.count(to_apply) + Enum.count(applied) + 1)
 
     case expansion.rule_type do
       :alpha ->
@@ -95,7 +84,7 @@ defmodule Tableaux do
 
   @spec parse_sequent(binary) :: [RuleNode.t(), ...]
   def parse_sequent(sequent) do
-    add_signs(SequentParser.parse(sequent), 0)
+    add_signs(SequentParser.parse(sequent), 0, 1)
   end
 
   @spec add_alpha_rules(BinTree.t(), [RuleNode.t()], binary(), boolean()) :: BinTree.t()

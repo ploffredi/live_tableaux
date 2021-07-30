@@ -14,8 +14,7 @@ defmodule LiveTableaux.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: LiveTableaux.PubSub},
       # Start the Endpoint (http/https)
-      LiveTableauxWeb.Endpoint,
-      {UniqueCounter, []}
+      LiveTableauxWeb.Endpoint
       # Start a worker by calling: LiveTableaux.Worker.start_link(arg)
       # {LiveTableaux.Worker, arg}
     ]
