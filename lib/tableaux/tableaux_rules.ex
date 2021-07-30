@@ -96,7 +96,7 @@ defmodule TableauxRules do
     %RuleExpansion{
       rule_type: rule_type,
       expanded_nodes:
-        Enum.zip(nodes_signs, [{expr1, counter}, {expr2, counter+1}])
+        Enum.zip(nodes_signs, [{expr1, counter}, {expr2, counter + 1}])
         |> Enum.map(fn {s, {e, c}} ->
           %RuleNode{
             sign: s,

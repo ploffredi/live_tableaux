@@ -78,7 +78,8 @@ Hooks.D3Tree = {
 
                   // adds the circle to the node
                   nodes.append("circle")
-                  .attr("r", 10);
+                  .attr("r", 10)
+                  .style("fill", function(d) { return d.data.color; });
 
                   // adds the text to the node
                   nodes.append("text")

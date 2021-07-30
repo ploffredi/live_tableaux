@@ -10,14 +10,10 @@
       <button style="background-color:white;color:blue;padding:5px;padding-top:0px;margin:2px" phx-click="add_implies">&rarr;</button>
   </div>
 
-  <form phx-change="suggest" phx-submit="validate">
+  <form phx-change="suggest" phx-submit="expand">
     <input type="text" name="q" value="<%= @sequent %>" placeholder="Sequent in the format     expr1,expr2,... exprN|-exprR     (Eg. p|q,!p|-q )" autocomplete="off"/>
-    <button type="submit" phx-disable-with="Validating...">Validate</button>
+    <button type="submit" phx-disable-with="Expanding...">Expand sequent</button>
   </form>
 
-  <form phx-change="suggest" phx-submit="expand">
-    <input type="hidden" name="q" value="<%= @sequent %>" placeholder="Sequent in the format     expr1,expr2,... exprN|-exprR     (Eg. p|q,!p|-q )" autocomplete="off"/>
-    <button  type="submit" phx-disable-with="Validating...">Expand sequent (test)</button>
-  </form>
  <div id="d3-result" phx-hook="D3Tree" phx-update="ignore">
 </section>

@@ -7,6 +7,9 @@ defmodule BinTree do
   `right` is the right subtree (nil if no subtree).
   """
 
+  @node_color "rgb(0,240,0)"
+  @leaf_color "rgb(240,0,0)"
+
   @type t :: %BinTree{
           value: any,
           left: t() | nil,
@@ -19,41 +22,45 @@ defmodule BinTree do
 
   defstruct [:value, :left, :right, :sign, :string, nid: nil, source: nil]
 
-  def to_map(%BinTree{string: string, sign: sign, left: nil, right: nil, nid: nid, source: source}) do
-    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: []}
+  defp get_full_name(%BinTree{string: string, sign: sign, nid: nid, source: source}) do
+    source=if !is_nil(source), do: "#{source}:", else: ""
+    "#{sign} #{string}    [#{source}#{nid}]"
   end
 
-  def to_map(%BinTree{
-        string: string,
-        sign: sign,
-        left: left,
-        right: nil,
-        nid: nid,
-        source: source
-      }) do
-    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: [to_map(left)]}
+  def to_map(
+        %BinTree{
+          left: nil,
+          right: nil
+        } = tree
+      ) do
+    %{name: get_full_name(tree), color: @leaf_color, children: []}
   end
 
-  def to_map(%BinTree{
-        string: string,
-        sign: sign,
-        left: nil,
-        right: right,
-        nid: nid,
-        source: source
-      }) do
-    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: [to_map(right)]}
+  def to_map(
+        %BinTree{
+          left: left,
+          right: nil
+        } = tree
+      ) do
+    %{name: get_full_name(tree), color: @node_color, children: [to_map(left)]}
   end
 
-  def to_map(%BinTree{
-        string: string,
-        sign: sign,
-        left: left,
-        right: right,
-        nid: nid,
-        source: source
-      }) do
-    %{name: "#{sign} #{string}  (#{source}->#{nid})", children: [to_map(left), to_map(right)]}
+  def to_map(
+        %BinTree{
+          left: nil,
+          right: right
+        } = tree
+      ) do
+    %{name: get_full_name(tree), color: @node_color, children: [to_map(right)]}
+  end
+
+  def to_map(
+        %BinTree{
+          left: left,
+          right: right
+        } = tree
+      ) do
+    %{name: get_full_name(tree), color: @node_color, children: [to_map(left), to_map(right)]}
   end
 
   @spec linear_branch_from_list([RuleNode.t()]) :: BinTree.t()
