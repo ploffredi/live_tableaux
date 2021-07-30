@@ -13,8 +13,9 @@ defmodule RuleNode do
 
   def empty_with_nid() do
     UniqueCounter.increment()
+
     %RuleNode{
-      nid: Integer.to_string(UniqueCounter.get_value)
+      nid: Integer.to_string(UniqueCounter.get_value())
     }
   end
 end

@@ -1,4 +1,17 @@
 defmodule TableauxRules do
+  @expansion_rules %{
+    {:F, :atom} => {:alpha, []},
+    {:T, :atom} => {:alpha, []},
+    {:F, :conjunction} => {:beta, [:F, :F]},
+    {:T, :implication} => {:beta, [:F, :T]},
+    {:T, :disjunction} => {:beta, [:T, :T]},
+    {:F, :implication} => {:alpha, [:T, :F]},
+    {:F, :disjunction} => {:alpha, [:F, :F]},
+    {:T, :conjunction} => {:alpha, [:T, :T]},
+    {:F, :negation} => {:alpha, [:T]},
+    {:T, :negation} => {:alpha, [:F]}
+  }
+
   def compare_operators(first, second) do
     case first do
       :atom ->
@@ -52,7 +65,7 @@ defmodule TableauxRules do
       })
       when is_atom(atom),
       do: %RuleExpansion{
-        rule_type: get_rule_type(:F, :atom),
+        rule_type: :alpha,
         expanded_nodes: []
       }
 
@@ -64,195 +77,53 @@ defmodule TableauxRules do
       })
       when is_atom(atom),
       do: %RuleExpansion{
-        rule_type: get_rule_type(:T, :atom),
+        rule_type: :alpha,
         expanded_nodes: []
       }
 
   def get_rule_expansion(%RuleNode{
-        sign: :F,
-        expression: {:conjunction, expr1, expr2},
+        sign: sign,
+        expression: {operator, expr1, expr2},
         nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:F, :conjunction),
-        expanded_nodes: [
+      }) do
+    {rule_type, nodes_signs} = Map.get(@expansion_rules, {sign, operator})
+
+    %RuleExpansion{
+      rule_type: rule_type,
+      expanded_nodes:
+        Enum.zip(nodes_signs, [expr1, expr2])
+        |> Enum.map(fn {s, e} ->
           %RuleNode{
             RuleNode.empty_with_nid()
-            | sign: :F,
+            | sign: s,
               string: Expressions.expression_to_string(expr1),
-              expression: expr1,
-              source: nid
-          },
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :F,
-              string: Expressions.expression_to_string(expr2),
-              expression: expr2,
+              expression: e,
               source: nid
           }
-        ]
-      }
+        end)
+    }
+  end
 
   def get_rule_expansion(%RuleNode{
-        sign: :T,
-        expression: {:implication, expr1, expr2},
+        sign: sign,
+        expression: {operator, expr1},
         nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:T, :implication),
-        expanded_nodes: [
+      }) do
+    {rule_type, nodes_signs} = Map.get(@expansion_rules, {sign, operator})
+
+    %RuleExpansion{
+      rule_type: rule_type,
+      expanded_nodes:
+        Enum.zip(nodes_signs, [expr1])
+        |> Enum.map(fn {s, e} ->
           %RuleNode{
             RuleNode.empty_with_nid()
-            | sign: :F,
+            | sign: s,
               string: Expressions.expression_to_string(expr1),
-              expression: expr1,
-              source: nid
-          },
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :T,
-              string: Expressions.expression_to_string(expr2),
-              expression: expr2,
+              expression: e,
               source: nid
           }
-        ]
-      }
-
-  def get_rule_expansion(%RuleNode{
-        sign: :T,
-        expression: {:disjunction, expr1, expr2},
-        nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:T, :disjunction),
-        expanded_nodes: [
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :T,
-              string: Expressions.expression_to_string(expr1),
-              expression: expr1,
-              source: nid
-          },
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :T,
-              string: Expressions.expression_to_string(expr2),
-              expression: expr2,
-              source: nid
-          }
-        ]
-      }
-
-  def get_rule_expansion(%RuleNode{
-        sign: :F,
-        expression: {:implication, expr1, expr2},
-        nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:F, :implication),
-        expanded_nodes: [
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :T,
-              string: Expressions.expression_to_string(expr1),
-              expression: expr1,
-              source: nid
-          },
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :F,
-              string: Expressions.expression_to_string(expr2),
-              expression: expr2,
-              source: nid
-          }
-        ]
-      }
-
-  def get_rule_expansion(%RuleNode{
-        sign: :F,
-        expression: {:disjunction, expr1, expr2},
-        nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:F, :disjunction),
-        expanded_nodes: [
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :F,
-              string: Expressions.expression_to_string(expr1),
-              expression: expr1,
-              source: nid
-          },
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :F,
-              string: Expressions.expression_to_string(expr2),
-              expression: expr2,
-              source: nid
-          }
-        ]
-      }
-
-  def get_rule_expansion(%RuleNode{
-        sign: :T,
-        expression: {:conjunction, expr1, expr2},
-        nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:T, :conjunction),
-        expanded_nodes: [
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :T,
-              string: Expressions.expression_to_string(expr1),
-              expression: expr1,
-              source: nid
-          },
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :T,
-              string: Expressions.expression_to_string(expr2),
-              expression: expr2,
-              source: nid
-          }
-        ]
-      }
-
-  def get_rule_expansion(%RuleNode{
-        sign: :F,
-        string: _,
-        expression: {:negation, expr},
-        nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:F, :negation),
-        expanded_nodes: [
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :T,
-              string: Expressions.expression_to_string(expr),
-              expression: expr,
-              source: nid
-          }
-        ]
-      }
-
-  def get_rule_expansion(%RuleNode{
-        sign: :T,
-        string: _,
-        expression: {:negation, expr},
-        nid: nid
-      }),
-      do: %RuleExpansion{
-        rule_type: get_rule_type(:T, :negation),
-        expanded_nodes: [
-          %RuleNode{
-            RuleNode.empty_with_nid()
-            | sign: :F,
-              string: Expressions.expression_to_string(expr),
-              expression: expr,
-              source: nid
-          }
-        ]
-      }
+        end)
+    }
+  end
 end

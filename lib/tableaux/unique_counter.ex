@@ -20,7 +20,7 @@ defmodule UniqueCounter do
   end
 
   def handle_cast(:increment, state) do
-    {:noreply, state+1}
+    {:noreply, state + 1}
   end
 
   def handle_cast(:reset, _state) do
