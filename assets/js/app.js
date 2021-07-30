@@ -23,6 +23,7 @@ Hooks.D3Tree = {
 
 
     this.handleEvent("updateResultTree", (treeData) =>{
+
                   // set the dimensions and margins of the diagram
                   var margin = {top: 40, right: 0, bottom: 50, left: 0},
                   width = 500 - margin.left - margin.right,
@@ -41,7 +42,12 @@ Hooks.D3Tree = {
                   // append the svg object to the element of the page
                   // appends a 'group' element to 'svg'
                   // moves the 'group' element to the top left margin
+                  
+                  d3.select(".svg-container").remove();
+
+
                   var svg = d3.select("#" + this.el.id).append("svg")
+                    .attr("class", "svg-container")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom),
                   g = svg.append("g")
