@@ -12,35 +12,11 @@ defmodule TableauxRules do
     {:T, :negation} => {:alpha, [:F]}
   }
 
-  def compare_operators(first, second) do
-    case first do
-      :atom ->
-        case second do
-          :atom -> false
-          :alpha -> false
-          :beta -> false
-        end
-
-      :alpha ->
-        case second do
-          :atom -> true
-          :alpha -> false
-          :beta -> true
-        end
-
-      :beta ->
-        case second do
-          :atom -> true
-          :alpha -> false
-          :beta -> false
-        end
-    end
-  end
-
-  defp get_rule_type_op(sign, operator) do
-    {rule_type, _nodes_signs} = Map.get(@expansion_rules, {sign, operator})
-    rule_type
-  end
+  @spec compare_operators(atom(), atom()) :: boolean()
+  def compare_operators(op, op), do: false
+  def compare_operators(:alpha, _), do: true
+  def compare_operators(_, :beta), do: true
+  def compare_operators(_, _), do: false
 
   @spec get_rule_type(any, atom | {any, any} | {any, any, any}) :: any
   def get_rule_type(sign, {operator, _, _}),
@@ -51,6 +27,11 @@ defmodule TableauxRules do
 
   def get_rule_type(sign, atom) when is_atom(atom),
     do: get_rule_type_op(sign, :atom)
+
+  defp get_rule_type_op(sign, operator) do
+    {rule_type, _nodes_signs} = Map.get(@expansion_rules, {sign, operator})
+    rule_type
+  end
 
   @spec get_rule_expansion(RuleNode.t(), integer()) :: RuleExpansion.t()
   def get_rule_expansion(
