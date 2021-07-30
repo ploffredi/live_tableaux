@@ -37,10 +37,6 @@ defmodule TableauxRules do
     end
   end
 
-
-
-
-
   defp get_rule_type_op(sign, operator) do
     {rule_type, _nodes_signs} = Map.get(@expansion_rules, {sign, operator})
     rule_type
@@ -48,13 +44,13 @@ defmodule TableauxRules do
 
   @spec get_rule_type(any, atom | {any, any} | {any, any, any}) :: any
   def get_rule_type(sign, {operator, _, _}),
-  do: get_rule_type_op(sign, operator)
+    do: get_rule_type_op(sign, operator)
 
   def get_rule_type(sign, {operator, _}),
-  do: get_rule_type_op(sign, operator)
+    do: get_rule_type_op(sign, operator)
 
   def get_rule_type(sign, atom) when is_atom(atom),
-  do: get_rule_type_op(sign, :atom)
+    do: get_rule_type_op(sign, :atom)
 
   @spec get_rule_expansion(RuleNode.t()) :: RuleExpansion.t()
   def get_rule_expansion(%RuleNode{

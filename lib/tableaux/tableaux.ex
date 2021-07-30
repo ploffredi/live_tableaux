@@ -42,8 +42,6 @@ defmodule Tableaux do
     expand(first_tree, signed_expressions_list, [])
   end
 
-
-
   @spec expand(any, [RuleNode.t()], [RuleNode.t()]) :: BinTree.t()
   def expand(tree, [], _) do
     tree
@@ -57,12 +55,14 @@ defmodule Tableaux do
         &TableauxRules.compare_operators(&1, &2)
       )
 
+    rest
+    |> Enum.map(&"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]")
+    |> IO.inspect(label: "to apply")
 
-    rest |>
-    Enum.map(&("#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]"))
-    |> IO.inspect( label: "to apply")
+    IO.inspect("#{to_expand.sign} #{to_expand.string} [#{to_expand.source},#{to_expand.nid}]",
+      label: "to expand"
+    )
 
-    IO.inspect("#{to_expand.sign} #{to_expand.string} [#{to_expand.source},#{to_expand.nid}]", label: "to expand")
     IO.inspect(to_expand, label: "to expand")
 
     expansion = TableauxRules.get_rule_expansion(to_expand)
