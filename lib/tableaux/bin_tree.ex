@@ -9,6 +9,7 @@ defmodule BinTree do
 
   @node_color "rgb(0,240,0)"
   @leaf_color "rgb(240,0,0)"
+  @closed_color "rgb(0,0,0)"
 
   @type t :: %BinTree{
           value: any,
@@ -17,10 +18,11 @@ defmodule BinTree do
           sign: :T | :F,
           string: binary(),
           nid: binary(),
-          source: binary()
+          source: binary(),
+          closed: boolean()
         }
 
-  defstruct [:value, :left, :right, :sign, :string, nid: nil, source: nil]
+  defstruct [:value, :left, :right, :sign, :string, nid: nil, source: nil, closed: false]
 
   defp get_full_name(%BinTree{string: string, sign: sign, nid: nid, source: source}) do
     source = if !is_nil(source), do: "#{source}:", else: ""
@@ -33,7 +35,11 @@ defmodule BinTree do
           right: nil
         } = tree
       ) do
-    %{name: get_full_name(tree), color: @leaf_color, children: []}
+    if tree.closed do
+      %{name: get_full_name(tree), color: @closed_color, children: []}
+    else
+      %{name: get_full_name(tree), color: @leaf_color, children: []}
+    end
   end
 
   def to_map(
@@ -42,7 +48,11 @@ defmodule BinTree do
           right: nil
         } = tree
       ) do
-    %{name: get_full_name(tree), color: @node_color, children: [to_map(left)]}
+    if tree.closed do
+      %{name: get_full_name(tree), color: @closed_color, children: [to_map(left)]}
+    else
+      %{name: get_full_name(tree), color: @node_color, children: [to_map(left)]}
+    end
   end
 
   def to_map(
@@ -51,7 +61,11 @@ defmodule BinTree do
           right: right
         } = tree
       ) do
-    %{name: get_full_name(tree), color: @node_color, children: [to_map(right)]}
+    if tree.closed do
+      %{name: get_full_name(tree), color: @closed_color, children: [to_map(right)]}
+    else
+      %{name: get_full_name(tree), color: @node_color, children: [to_map(right)]}
+    end
   end
 
   def to_map(
@@ -60,19 +74,23 @@ defmodule BinTree do
           right: right
         } = tree
       ) do
-    %{name: get_full_name(tree), color: @node_color, children: [to_map(left), to_map(right)]}
+    if tree.closed do
+      %{name: get_full_name(tree), color: @closed_color, children: [to_map(left), to_map(right)]}
+    else
+      %{name: get_full_name(tree), color: @node_color, children: [to_map(left), to_map(right)]}
+    end
   end
 
   @spec linear_branch_from_list([RuleNode.t()]) :: BinTree.t()
   def linear_branch_from_list([]), do: nil
 
   def linear_branch_from_list([
-        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source}
+        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source, closed: closed}
       ]),
-      do: %BinTree{value: value, sign: sign, string: string, nid: nid, source: source}
+      do: %BinTree{value: value, sign: sign, string: string, nid: nid, source: source, closed: closed}
 
   def linear_branch_from_list([
-        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source} | t
+        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source, closed: closed} | t
       ]),
       do: %BinTree{
         value: value,
@@ -80,7 +98,9 @@ defmodule BinTree do
         string: string,
         left: linear_branch_from_list(t),
         nid: nid,
-        source: source
+        source: source,
+        closed: closed
+
       }
 end
 

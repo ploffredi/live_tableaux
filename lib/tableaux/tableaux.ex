@@ -31,18 +31,16 @@ defmodule Tableaux do
         sign: :T,
         source: nil,
         step: step,
-        string: Expressions.expression_to_string(expression),
+        string: Expressions.expression_to_string(expression)
       }
     ] ++
       add_signs(t, step, idx + 1)
   end
 
-
-
   @spec verify(binary()) :: BinTree.t()
   def verify(sequent) do
     signed_expressions_list = SequentParser.parse(sequent) |> add_signs(0, 1)
-    first_tree = add_alpha_rules(nil, signed_expressions_list, nil, false)
+    first_tree = BinTree.linear_branch_from_list(signed_expressions_list)
     expand(first_tree, signed_expressions_list, [])
   end
 
@@ -64,13 +62,13 @@ defmodule Tableaux do
 
     case expansion.rule_type do
       :alpha ->
-        add_alpha_rules(tree, expansion.expanded_nodes, to_expand.nid, false)
+        add_alpha_rules(tree, expansion.expanded_nodes, to_expand.nid, false, [tree])
 
       :beta ->
-        add_beta_rules_list(tree, expansion.expanded_nodes, to_expand.nid)
+        add_beta_rules_list(tree, expansion.expanded_nodes, to_expand.nid, [tree])
 
       :atom ->
-        add_alpha_rules(tree, expansion.expanded_nodes, to_expand.nid, false)
+        add_alpha_rules(tree, expansion.expanded_nodes, to_expand.nid, false, [tree])
     end
     |> expand(rest ++ expansion.expanded_nodes, [to_expand | applied])
   end
@@ -83,7 +81,7 @@ defmodule Tableaux do
 
   """
   def from_sequent(sequent) do
-    add_alpha_rules(nil, parse_sequent(sequent), nil, false)
+    BinTree.linear_branch_from_list(parse_sequent(sequent))
   end
 
   @spec parse_sequent(binary) :: [RuleNode.t()]
@@ -91,87 +89,121 @@ defmodule Tableaux do
     add_signs(SequentParser.parse(sequent), 0, 1)
   end
 
-  @spec add_alpha_rules(nil|BinTree.t(), [RuleNode.t()], nil|binary(), boolean()) :: BinTree.t()
+  defp invert_sign(:T), do: :F
+  defp invert_sign(:F), do: :T
+
+
+  defp closed_path([],_) do
+    false
+  end
+
+  defp closed_path([{sign,string}|t],lst) do
+    Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end) || closed_path(t)
+  end
+
+  defp closed_path([]), do: false
+  defp closed_path([h | t]) do
+    Enum.any?(t, fn e -> e.sign == invert_sign(h.sign) && e.string == h.string end) ||
+      closed_path(t)
+  end
+
+  @spec add_alpha_rules(nil | BinTree.t(), [RuleNode.t()], nil | binary(), boolean(), [binary()]) ::
+          BinTree.t()
   @doc ~S"""
   Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
   need to create the first tree after the sequent parsing
 
 
   """
-  def add_alpha_rules(nil, list, _ancestor, _ancestor_found) do
-    BinTree.linear_branch_from_list(list)
+  def add_alpha_rules(nil, _list, _ancestor, _ancestor_found, _path) do
+    nil
   end
 
   def add_alpha_rules(
         %BinTree{nid: nid, left: nil, right: nil} = tree,
         list,
         ancestor,
-        ancestor_found
+        ancestor_found,
+        path
       ) do
-    case ancestor_found || nid == ancestor do
+        #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha_leaf")
+    is_closed_path = closed_path(path)
+
+    branch=list
+    |> Enum.map(fn n -> %RuleNode{n | closed: closed_path([{n.sign, n.string}], [tree|path])} end)
+    |> BinTree.linear_branch_from_list
+
+
+    case (ancestor_found || nid == ancestor) && !is_closed_path do
       true ->
-        %BinTree{tree | left: BinTree.linear_branch_from_list(list)}
+        %BinTree{tree | left: branch}
 
       false ->
-        tree
+        if is_closed_path do
+          %BinTree{tree | closed: true}
+        else
+          tree
+        end
     end
-  end
-
-  def add_alpha_rules(
-        %BinTree{nid: nid, left: nil, right: right} = tree,
-        list,
-        ancestor,
-        ancestor_found
-      ) do
-    %BinTree{
-      tree
-      | right: add_alpha_rules(right, list, ancestor, ancestor_found || nid == ancestor)
-    }
-  end
-
-  def add_alpha_rules(
-        %BinTree{nid: nid, left: left, right: nil} = tree,
-        list,
-        ancestor,
-        ancestor_found
-      ) do
-    %BinTree{
-      tree
-      | left: add_alpha_rules(left, list, ancestor, ancestor_found || nid == ancestor)
-    }
   end
 
   def add_alpha_rules(
         %BinTree{nid: nid, left: left, right: right} = tree,
         list,
         ancestor,
-        ancestor_found
+        ancestor_found,
+        path
       ) do
-    %BinTree{
-      tree
-      | left: add_alpha_rules(left, list, ancestor, ancestor_found || nid == ancestor),
-        right: add_alpha_rules(right, list, ancestor, ancestor_found || nid == ancestor)
-    }
+    #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha")
+
+    if closed_path(path) do
+      %BinTree{
+        tree
+        | left: nil,
+          right: nil,
+          closed: true
+      }
+    else
+      %BinTree{
+        tree
+        | left:
+            add_alpha_rules(left, list, ancestor, ancestor_found || nid == ancestor, [tree | path]),
+          right:
+            add_alpha_rules(right, list, ancestor, ancestor_found || nid == ancestor, [
+              tree | path
+            ])
+      }
+    end
   end
 
-  @spec add_beta_rules_list(BinTree.t(), [nil | RuleNode.t()], binary()) :: BinTree.t()
-  defp add_beta_rules_list(tree, [left, right], ancestor) do
-    add_beta_rules(tree, left, right, ancestor, false)
+  @spec add_beta_rules_list(BinTree.t(), [nil | RuleNode.t()], binary(), [BinTree.t()]) ::
+          BinTree.t()
+  defp add_beta_rules_list(tree, [left, right], ancestor, path) do
+    add_beta_rules(tree, left, right, ancestor, false, path)
   end
 
-  @spec add_beta_rules(BinTree.t(), nil | RuleNode.t(), nil | RuleNode.t(), binary(), boolean()) ::
+  @spec add_beta_rules(BinTree.t(), nil | RuleNode.t(), nil | RuleNode.t(), binary(), boolean(), [
+          BinTree.t()
+        ]) ::
           BinTree.t()
   @doc ~S"""
   Apply a beta rules from tableaux to all the leaf nodes of a tree.
   """
+
+  def add_beta_rules(nil, _, _, _, _, _), do: nil
+
   def add_beta_rules(
         %BinTree{nid: nid, left: nil, right: nil} = tree,
         %RuleNode{sign: lsign, expression: lexp, string: lstr, nid: lnid, source: lsource},
         %RuleNode{sign: rsign, expression: rexp, string: rstr, nid: rnid, source: rsource},
         ancestor,
-        ancestor_found
+        ancestor_found,
+        path
       ) do
-    case ancestor_found || ancestor == nid do
+        #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta_leaf")
+    is_closed_path = closed_path(path)
+
+    case (ancestor_found || nid == ancestor) && !is_closed_path do
       true ->
         %BinTree{
           tree
@@ -180,46 +212,26 @@ defmodule Tableaux do
               sign: lsign,
               string: lstr,
               nid: lnid,
-              source: lsource
+              source: lsource,
+              closed: closed_path([{lsign,lstr}],[tree|path])
             },
             right: %BinTree{
               value: rexp,
               sign: rsign,
               string: rstr,
               nid: rnid,
-              source: rsource
+              source: rsource,
+              closed: closed_path([{rsign,rstr}],[tree|path])
             }
         }
 
       false ->
-        tree
+        if is_closed_path do
+          %BinTree{tree | closed: true}
+        else
+          tree
+        end
     end
-  end
-
-  def add_beta_rules(
-        %BinTree{nid: nid, left: nil, right: right} = tree,
-        lexp,
-        rexp,
-        ancestor,
-        ancestor_found
-      ) do
-    %BinTree{
-      tree
-      | right: add_beta_rules(right, lexp, rexp, ancestor, ancestor_found || nid == ancestor)
-    }
-  end
-
-  def add_beta_rules(
-        %BinTree{nid: nid, left: left, right: nil} = tree,
-        lexp,
-        rexp,
-        ancestor,
-        ancestor_found
-      ) do
-    %BinTree{
-      tree
-      | left: add_beta_rules(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor)
-    }
   end
 
   def add_beta_rules(
@@ -227,12 +239,29 @@ defmodule Tableaux do
         lexp,
         rexp,
         ancestor,
-        ancestor_found
+        ancestor_found,
+        path
       ) do
-    %BinTree{
-      tree
-      | left: add_beta_rules(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor),
-        right: add_beta_rules(right, lexp, rexp, ancestor, ancestor_found || nid == ancestor)
-    }
+        #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta")
+    if closed_path(path) do
+      %BinTree{
+        tree
+        | left: nil,
+          right: nil,
+          closed: true
+      }
+    else
+      %BinTree{
+        tree
+        | left:
+            add_beta_rules(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
+              tree | path
+            ]),
+          right:
+            add_beta_rules(right, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
+              tree | path
+            ])
+      }
+    end
   end
 end

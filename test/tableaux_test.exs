@@ -5,7 +5,7 @@ defmodule TableauxTest do
 
   test "reference tableaux formula" do
     """
-        assert Tableaux.verify("p, p>q |- (!p>q)&q") ==
+        assert Tableaux.verify("w|-(p∨(q∧r))→((p∨q)∧(p∨r))") ==
           %BinTree{
             left: %BinTree{
               left: %BinTree{

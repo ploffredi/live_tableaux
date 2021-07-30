@@ -3,11 +3,12 @@ defmodule RuleNode do
   @type t :: %RuleNode{
           expression: Expressions.expr(),
           string: binary(),
-          source: nil|binary(),
+          source: nil | binary(),
           step: integer(),
           sign: :T | :F,
-          nid: binary()
+          nid: binary(),
+          closed: boolean()
         }
 
-  defstruct [:expression, :string, :source, :step, :sign, nid: nil]
+  defstruct [:expression, :string, :source, :step, :sign, nid: nil, closed: false]
 end

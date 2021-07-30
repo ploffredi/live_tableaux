@@ -23,7 +23,10 @@ elems -> elems implication elems : {extract_token('$2'), '$1' , '$3'}.
 elems -> '(' elems ')' : '$2'.
 elems -> atom : extract_token('$1').  
 
+
+sequent -> assertion descendant : '$2'.
 sequent -> ascendants assertion descendant : '$1' ++ '$3'.
+
 
 descendant -> elems : ['$1'].
 
