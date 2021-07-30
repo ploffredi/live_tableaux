@@ -6,6 +6,7 @@ defmodule Expressions do
           | {:disjunction, atom | expr(), atom | expr()}
           | {:implication, atom | expr(), atom | expr()}
 
+  @spec expression_to_string(expr()) :: binary
   def expression_to_string(atom) when is_atom(atom) do
     "#{atom}"
   end

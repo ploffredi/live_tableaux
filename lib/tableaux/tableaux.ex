@@ -5,12 +5,11 @@ defmodule Tableaux do
 
   @spec add_signs(
           [
-            Expressions.expr(),
-            ...
+            Expressions.expr()
           ],
           integer(),
           integer()
-        ) :: [RuleNode.t(), ...]
+        ) :: [RuleNode.t()]
   def add_signs([expression], step, idx) do
     [
       %RuleNode{
@@ -28,11 +27,11 @@ defmodule Tableaux do
     [
       %RuleNode{
         expression: expression,
-        string: Expressions.expression_to_string(expression),
-        sign: :T,
-        step: step,
         nid: idx,
-        source: nil
+        sign: :T,
+        source: nil,
+        step: step,
+        string: Expressions.expression_to_string(expression),
       }
     ] ++
       add_signs(t, step, idx + 1)
@@ -40,13 +39,14 @@ defmodule Tableaux do
 
 
 
+  @spec verify(binary()) :: BinTree.t()
   def verify(sequent) do
     signed_expressions_list = SequentParser.parse(sequent) |> add_signs(0, 1)
     first_tree = add_alpha_rules(nil, signed_expressions_list, nil, false)
     expand(first_tree, signed_expressions_list, [])
   end
 
-  @spec expand(any, [RuleNode.t()], [RuleNode.t()]) :: BinTree.t()
+  @spec expand(BinTree.t(), [RuleNode.t()], [RuleNode.t()]) :: BinTree.t()
   def expand(tree, [], _) do
     tree
   end
@@ -91,7 +91,7 @@ defmodule Tableaux do
     add_signs(SequentParser.parse(sequent), 0, 1)
   end
 
-  @spec add_alpha_rules(BinTree.t(), [RuleNode.t()], binary(), boolean()) :: BinTree.t()
+  @spec add_alpha_rules(nil|BinTree.t(), [RuleNode.t()], nil|binary(), boolean()) :: BinTree.t()
   @doc ~S"""
   Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
   need to create the first tree after the sequent parsing

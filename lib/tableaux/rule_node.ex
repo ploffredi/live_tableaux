@@ -3,7 +3,7 @@ defmodule RuleNode do
   @type t :: %RuleNode{
           expression: Expressions.expr(),
           string: binary(),
-          source: binary(),
+          source: nil|binary(),
           step: integer(),
           sign: :T | :F,
           nid: binary()
