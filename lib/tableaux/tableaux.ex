@@ -64,7 +64,17 @@ defmodule Tableaux do
         &TableauxRules.compare_operators(&1, &2)
       )
 
+
+    rest |>
+    Enum.map(&("#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]"))
+    |> IO.inspect( label: "to apply")
+
+    IO.inspect("#{to_expand.sign} #{to_expand.string} [#{to_expand.source},#{to_expand.nid}]", label: "to expand")
+    IO.inspect(to_expand, label: "to expand")
+
     expansion = TableauxRules.get_rule_expansion(to_expand)
+
+    IO.inspect(expansion, label: "rule expansion")
 
     case expansion.rule_type do
       :alpha ->
