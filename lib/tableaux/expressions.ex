@@ -1,4 +1,11 @@
 defmodule Expressions do
+  @type expr ::
+          atom
+          | {:negation, atom | expr()}
+          | {:conjunction, atom | expr(), atom | expr()}
+          | {:disjunction, atom | expr(), atom | expr()}
+          | {:implication, atom | expr(), atom | expr()}
+
   def expression_to_string(atom) when is_atom(atom) do
     "#{atom}"
   end

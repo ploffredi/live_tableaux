@@ -23,7 +23,7 @@ defmodule BinTree do
   defstruct [:value, :left, :right, :sign, :string, nid: nil, source: nil]
 
   defp get_full_name(%BinTree{string: string, sign: sign, nid: nid, source: source}) do
-    source=if !is_nil(source), do: "#{source}:", else: ""
+    source = if !is_nil(source), do: "#{source}:", else: ""
     "#{sign} #{string}    [#{source}#{nid}]"
   end
 

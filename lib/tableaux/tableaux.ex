@@ -5,9 +5,10 @@ defmodule Tableaux do
 
   @spec add_signs(
           [
-            any
+            Expressions.expr(),
+            ...
           ],
-          any,
+          integer(),
           integer()
         ) :: [RuleNode.t(), ...]
   def add_signs([expression], step, idx) do
@@ -17,7 +18,8 @@ defmodule Tableaux do
         string: Expressions.expression_to_string(expression),
         sign: :F,
         step: step,
-        nid: idx
+        nid: idx,
+        source: nil
       }
     ]
   end
@@ -29,11 +31,14 @@ defmodule Tableaux do
         string: Expressions.expression_to_string(expression),
         sign: :T,
         step: step,
-        nid: idx
+        nid: idx,
+        source: nil
       }
-      | add_signs(t, step, idx + 1)
-    ]
+    ] ++
+      add_signs(t, step, idx + 1)
   end
+
+
 
   def verify(sequent) do
     signed_expressions_list = SequentParser.parse(sequent) |> add_signs(0, 1)
@@ -81,7 +86,7 @@ defmodule Tableaux do
     add_alpha_rules(nil, parse_sequent(sequent), nil, false)
   end
 
-  @spec parse_sequent(binary) :: [RuleNode.t(), ...]
+  @spec parse_sequent(binary) :: [RuleNode.t()]
   def parse_sequent(sequent) do
     add_signs(SequentParser.parse(sequent), 0, 1)
   end

@@ -1,7 +1,7 @@
 defmodule RuleNode do
   @type rule :: :alpha | :beta | :atom
   @type t :: %RuleNode{
-          expression: any,
+          expression: Expressions.expr(),
           string: binary(),
           source: binary(),
           step: integer(),
