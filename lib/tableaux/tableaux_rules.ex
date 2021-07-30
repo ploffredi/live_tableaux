@@ -1,7 +1,7 @@
 defmodule TableauxRules do
   @expansion_rules %{
-    {:F, :atom} => {:alpha, []},
-    {:T, :atom} => {:alpha, []},
+    {:F, :atom} => {:atom, []},
+    {:T, :atom} => {:atom, []},
     {:F, :conjunction} => {:beta, [:F, :F]},
     {:T, :implication} => {:beta, [:F, :T]},
     {:T, :disjunction} => {:beta, [:T, :T]},
@@ -37,26 +37,26 @@ defmodule TableauxRules do
     end
   end
 
-  def get_rule_type(:T, :negation), do: :alpha
 
-  def get_rule_type(:F, :negation), do: :alpha
 
-  def get_rule_type(:T, :implication), do: :beta
 
-  def get_rule_type(:F, :implication), do: :alpha
 
-  def get_rule_type(:T, :conjunction), do: :alpha
+  defp get_rule_type_op(sign, operator) do
+    {rule_type, _nodes_signs} = Map.get(@expansion_rules, {sign, operator})
+    rule_type
+  end
 
-  def get_rule_type(:F, :conjunction), do: :beta
+  @spec get_rule_type(any, atom | {any, any} | {any, any, any}) :: any
+  def get_rule_type(sign, {operator, _, _}),
+  do: get_rule_type_op(sign, operator)
 
-  def get_rule_type(:T, :disjunction), do: :beta
+  def get_rule_type(sign, {operator, _}),
+  do: get_rule_type_op(sign, operator)
 
-  def get_rule_type(:F, :disjunction), do: :alpha
+  def get_rule_type(sign, atom) when is_atom(atom),
+  do: get_rule_type_op(sign, :atom)
 
-  def get_rule_type(:T, :atom), do: :atom
-
-  def get_rule_type(:F, :atom), do: :atom
-
+  @spec get_rule_expansion(RuleNode.t()) :: RuleExpansion.t()
   def get_rule_expansion(%RuleNode{
         sign: :F,
         string: _,

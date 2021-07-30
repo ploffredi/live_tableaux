@@ -42,14 +42,7 @@ defmodule Tableaux do
     expand(first_tree, signed_expressions_list, [])
   end
 
-  defp get_rule_type(sign, {operator, _, _}),
-    do: TableauxRules.get_rule_type(sign, operator)
 
-  defp get_rule_type(sign, {operator, _}),
-    do: TableauxRules.get_rule_type(sign, operator)
-
-  defp get_rule_type(sign, atom) when is_atom(atom),
-    do: TableauxRules.get_rule_type(sign, :atom)
 
   @spec expand(any, [RuleNode.t()], [RuleNode.t()]) :: BinTree.t()
   def expand(tree, [], _) do
@@ -60,7 +53,7 @@ defmodule Tableaux do
     [to_expand | rest] =
       to_apply
       |> Enum.sort_by(
-        &get_rule_type(&1.sign, &1.expression),
+        &TableauxRules.get_rule_type(&1.sign, &1.expression),
         &TableauxRules.compare_operators(&1, &2)
       )
 
