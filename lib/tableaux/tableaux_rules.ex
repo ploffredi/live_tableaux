@@ -119,7 +119,7 @@ defmodule TableauxRules do
           %RuleNode{
             RuleNode.empty_with_nid()
             | sign: s,
-              string: Expressions.expression_to_string(expr1),
+              string: Expressions.expression_to_string(e),
               expression: e,
               source: nid
           }
