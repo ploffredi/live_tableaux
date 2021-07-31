@@ -41,13 +41,13 @@ defmodule Tableaux do
   def verify(sequent) do
     signed_expressions_list = SequentParser.parse(sequent) |> add_signs(0, 1)
     first_tree = BinTree.linear_branch_from_list(signed_expressions_list)
-    expand(first_tree, signed_expressions_list, [])
+    expand(first_tree, signed_expressions_list)
   end
 
   @spec expand(BinTree.t(), [RuleNode.t()], [RuleNode.t()]) :: BinTree.t()
-  def expand(tree, [], _) do
-    tree
-  end
+  def expand(tree, to_apply, applied \\ [])
+
+  def expand(tree, [], _), do: tree
 
   def expand(tree, to_apply, applied) do
     [to_expand | rest] =
@@ -76,32 +76,30 @@ defmodule Tableaux do
   @spec from_sequent(binary) :: BinTree.t()
   @doc ~S"""
   Parses the given `sequent` into a binary tree.
-
-
-
   """
   def from_sequent(sequent) do
-    BinTree.linear_branch_from_list(parse_sequent(sequent))
+    sequent |> parse_sequent() |> BinTree.linear_branch_from_list()
   end
 
   @spec parse_sequent(binary) :: [RuleNode.t()]
   def parse_sequent(sequent) do
-    add_signs(SequentParser.parse(sequent), 0, 1)
+    sequent |> SequentParser.parse() |> add_signs(0, 1)
   end
 
   defp invert_sign(:T), do: :F
   defp invert_sign(:F), do: :T
 
-
-  defp closed_path([],_) do
+  defp closed_path([], _) do
     false
   end
 
-  defp closed_path([{sign,string}|t],lst) do
-    Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end) || closed_path(t)
+  defp closed_path([{sign, string} | t], lst) do
+    Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end) ||
+      closed_path(t)
   end
 
   defp closed_path([]), do: false
+
   defp closed_path([h | t]) do
     Enum.any?(t, fn e -> e.sign == invert_sign(h.sign) && e.string == h.string end) ||
       closed_path(t)
@@ -112,8 +110,6 @@ defmodule Tableaux do
   @doc ~S"""
   Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
   need to create the first tree after the sequent parsing
-
-
   """
   def add_alpha_rules(nil, _list, _ancestor, _ancestor_found, _path) do
     nil
@@ -126,13 +122,15 @@ defmodule Tableaux do
         ancestor_found,
         path
       ) do
-        #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha_leaf")
+    # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha_leaf")
     is_closed_path = closed_path(path)
 
-    branch=list
-    |> Enum.map(fn n -> %RuleNode{n | closed: closed_path([{n.sign, n.string}], [tree|path])} end)
-    |> BinTree.linear_branch_from_list
-
+    branch =
+      list
+      |> Enum.map(fn n ->
+        %RuleNode{n | closed: closed_path([{n.sign, n.string}], [tree | path])}
+      end)
+      |> BinTree.linear_branch_from_list()
 
     case (ancestor_found || nid == ancestor) && !is_closed_path do
       true ->
@@ -154,7 +152,7 @@ defmodule Tableaux do
         ancestor_found,
         path
       ) do
-    #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha")
+    # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha")
 
     if closed_path(path) do
       %BinTree{
@@ -200,7 +198,7 @@ defmodule Tableaux do
         ancestor_found,
         path
       ) do
-        #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta_leaf")
+    # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta_leaf")
     is_closed_path = closed_path(path)
 
     case (ancestor_found || nid == ancestor) && !is_closed_path do
@@ -213,7 +211,7 @@ defmodule Tableaux do
               string: lstr,
               nid: lnid,
               source: lsource,
-              closed: closed_path([{lsign,lstr}],[tree|path])
+              closed: closed_path([{lsign, lstr}], [tree | path])
             },
             right: %BinTree{
               value: rexp,
@@ -221,7 +219,7 @@ defmodule Tableaux do
               string: rstr,
               nid: rnid,
               source: rsource,
-              closed: closed_path([{rsign,rstr}],[tree|path])
+              closed: closed_path([{rsign, rstr}], [tree | path])
             }
         }
 
@@ -242,7 +240,7 @@ defmodule Tableaux do
         ancestor_found,
         path
       ) do
-        #Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta")
+    # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta")
     if closed_path(path) do
       %BinTree{
         tree
