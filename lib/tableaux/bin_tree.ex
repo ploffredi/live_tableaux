@@ -81,16 +81,16 @@ defmodule BinTree do
     end
   end
 
-  @spec linear_branch_from_list([RuleNode.t()]) :: BinTree.t()
+  @spec linear_branch_from_list([TableauxNode.t()]) :: BinTree.t()
   def linear_branch_from_list([]), do: nil
 
   def linear_branch_from_list([
-        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source, closed: closed}
+        %TableauxNode{sign: sign, expression: value, string: string, nid: nid, source: source, closed: closed}
       ]),
       do: %BinTree{value: value, sign: sign, string: string, nid: nid, source: source, closed: closed}
 
   def linear_branch_from_list([
-        %RuleNode{sign: sign, expression: value, string: string, nid: nid, source: source, closed: closed} | t
+        %TableauxNode{sign: sign, expression: value, string: string, nid: nid, source: source, closed: closed} | t
       ]),
       do: %BinTree{
         value: value,

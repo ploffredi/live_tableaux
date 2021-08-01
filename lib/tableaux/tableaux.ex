@@ -9,10 +9,10 @@ defmodule Tableaux do
           ],
           integer(),
           integer()
-        ) :: [RuleNode.t()]
+        ) :: [TableauxNode.t()]
   def add_signs([expression], step, idx) do
     [
-      %RuleNode{
+      %TableauxNode{
         expression: expression,
         string: Expressions.expression_to_string(expression),
         sign: :F,
@@ -25,7 +25,7 @@ defmodule Tableaux do
 
   def add_signs([expression | t], step, idx) do
     [
-      %RuleNode{
+      %TableauxNode{
         expression: expression,
         nid: idx,
         sign: :T,
@@ -44,7 +44,7 @@ defmodule Tableaux do
     expand(first_tree, signed_expressions_list)
   end
 
-  @spec expand(BinTree.t(), [RuleNode.t()], [RuleNode.t()]) :: BinTree.t()
+  @spec expand(BinTree.t(), [TableauxNode.t()], [TableauxNode.t()]) :: BinTree.t()
   def expand(tree, to_apply, applied \\ [])
 
   def expand(tree, [], _), do: tree
@@ -81,7 +81,7 @@ defmodule Tableaux do
     sequent |> parse_sequent() |> BinTree.linear_branch_from_list()
   end
 
-  @spec parse_sequent(binary) :: [RuleNode.t()]
+  @spec parse_sequent(binary) :: [TableauxNode.t()]
   def parse_sequent(sequent) do
     sequent |> SequentParser.parse() |> add_signs(0, 1)
   end
@@ -102,7 +102,7 @@ defmodule Tableaux do
       closed_path(t)
   end
 
-  @spec add_alpha_rules(nil | BinTree.t(), [RuleNode.t()], nil | binary(), boolean(), [binary()]) ::
+  @spec add_alpha_rules(nil | BinTree.t(), [TableauxNode.t()], nil | binary(), boolean(), [binary()]) ::
           BinTree.t()
   @doc ~S"""
   Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
@@ -125,7 +125,7 @@ defmodule Tableaux do
     branch =
       list
       |> Enum.map(fn n ->
-        %RuleNode{n | closed: closes_path({n.sign, n.string}, [tree | path])}
+        %TableauxNode{n | closed: closes_path({n.sign, n.string}, [tree | path])}
       end)
       |> BinTree.linear_branch_from_list()
 
@@ -171,13 +171,13 @@ defmodule Tableaux do
     end
   end
 
-  @spec add_beta_rules_list(BinTree.t(), [nil | RuleNode.t()], binary(), [BinTree.t()]) ::
+  @spec add_beta_rules_list(BinTree.t(), [nil | TableauxNode.t()], binary(), [BinTree.t()]) ::
           BinTree.t()
   defp add_beta_rules_list(tree, [left, right], ancestor, path) do
     add_beta_rules(tree, left, right, ancestor, false, path)
   end
 
-  @spec add_beta_rules(BinTree.t(), nil | RuleNode.t(), nil | RuleNode.t(), binary(), boolean(), [
+  @spec add_beta_rules(BinTree.t(), nil | TableauxNode.t(), nil | TableauxNode.t(), binary(), boolean(), [
           BinTree.t()
         ]) ::
           BinTree.t()
@@ -189,8 +189,8 @@ defmodule Tableaux do
 
   def add_beta_rules(
         %BinTree{nid: nid, left: nil, right: nil} = tree,
-        %RuleNode{sign: lsign, expression: lexp, string: lstr, nid: lnid, source: lsource},
-        %RuleNode{sign: rsign, expression: rexp, string: rstr, nid: rnid, source: rsource},
+        %TableauxNode{sign: lsign, expression: lexp, string: lstr, nid: lnid, source: lsource},
+        %TableauxNode{sign: rsign, expression: rexp, string: rstr, nid: rnid, source: rsource},
         ancestor,
         ancestor_found,
         path
