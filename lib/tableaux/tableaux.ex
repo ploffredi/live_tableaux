@@ -90,7 +90,7 @@ defmodule Tableaux do
   defp invert_sign(:F), do: :T
 
   defp closes_path({sign, string}, lst) do
-    Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end)
+    Enum.any?(lst, fn e -> e.value.sign == invert_sign(sign) && e.value.string == string end)
     ||
     closed_path(lst)
   end
@@ -98,7 +98,7 @@ defmodule Tableaux do
   defp closed_path([]), do: false
 
   defp closed_path([h | t]) do
-    Enum.any?(t, fn e -> e.sign == invert_sign(h.sign) && e.string == h.string end) ||
+    Enum.any?(t, fn e -> e.value.sign == invert_sign(h.value.sign) && e.value.string == h.value.string end) ||
       closed_path(t)
   end
 
@@ -113,7 +113,7 @@ defmodule Tableaux do
   end
 
   def add_alpha_rules(
-        %BinTree{nid: nid, left: nil, right: nil} = tree,
+        %BinTree{value: %TableauxNode{nid: nid}=value, left: nil, right: nil} = tree,
         list,
         ancestor,
         ancestor_found,
@@ -135,7 +135,7 @@ defmodule Tableaux do
 
       false ->
         if is_closed_path do
-          %BinTree{tree | closed: true}
+          %BinTree{ tree | value: %TableauxNode{value | closed: true } }
         else
           tree
         end
@@ -143,7 +143,7 @@ defmodule Tableaux do
   end
 
   def add_alpha_rules(
-        %BinTree{nid: nid, left: left, right: right} = tree,
+        %BinTree{value: %TableauxNode{nid: nid}=value, left: left, right: right} = tree,
         list,
         ancestor,
         ancestor_found,
@@ -156,7 +156,7 @@ defmodule Tableaux do
         tree
         | left: nil,
           right: nil,
-          closed: true
+          value: %TableauxNode{value | closed: true }
       }
     else
       %BinTree{
@@ -188,9 +188,9 @@ defmodule Tableaux do
   def add_beta_rules(nil, _, _, _, _, _), do: nil
 
   def add_beta_rules(
-        %BinTree{nid: nid, left: nil, right: nil} = tree,
-        %TableauxNode{sign: lsign, expression: lexp, string: lstr, nid: lnid, source: lsource},
-        %TableauxNode{sign: rsign, expression: rexp, string: rstr, nid: rnid, source: rsource},
+        %BinTree{value: %TableauxNode{nid: nid}=value, left: nil, right: nil} = tree,
+        %TableauxNode{sign: lsign, string: lstr} = lnode,
+        %TableauxNode{sign: rsign, string: rstr} = rnode,
         ancestor,
         ancestor_found,
         path
@@ -203,26 +203,16 @@ defmodule Tableaux do
         %BinTree{
           tree
           | left: %BinTree{
-              value: lexp,
-              sign: lsign,
-              string: lstr,
-              nid: lnid,
-              source: lsource,
-              closed: closes_path({lsign, lstr}, [tree | path])
+              value: %TableauxNode{ lnode | closed: closes_path({lsign, lstr}, [tree | path])},
             },
             right: %BinTree{
-              value: rexp,
-              sign: rsign,
-              string: rstr,
-              nid: rnid,
-              source: rsource,
-              closed: closes_path({rsign, rstr}, [tree | path])
+              value: %TableauxNode{ rnode | closed: closes_path({rsign, rstr}, [tree | path])},
             }
         }
 
       false ->
         if is_closed_path do
-          %BinTree{tree | closed: true}
+          %BinTree{tree | value: %TableauxNode{value| closed: true} }
         else
           tree
         end
@@ -230,7 +220,7 @@ defmodule Tableaux do
   end
 
   def add_beta_rules(
-        %BinTree{nid: nid, left: left, right: right} = tree,
+        %BinTree{value: %TableauxNode{nid: nid}=value, left: left, right: right} = tree,
         lexp,
         rexp,
         ancestor,
@@ -243,7 +233,7 @@ defmodule Tableaux do
         tree
         | left: nil,
           right: nil,
-          closed: true
+          value: %TableauxNode{value| closed: true}
       }
     else
       %BinTree{
