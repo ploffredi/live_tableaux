@@ -48,8 +48,7 @@ defmodule LiveTableaux.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:uuid, "~> 1.1"},
-      {:nanoid, "~> 2.0.5"},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+      {:nanoid, "~> 2.0.5"}
     ]
   end
 
