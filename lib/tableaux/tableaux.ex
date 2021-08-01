@@ -68,7 +68,7 @@ defmodule Tableaux do
         add_beta_rules_list(tree, expansion.expanded_nodes, to_expand.nid, [tree])
 
       :atom ->
-        add_alpha_rules(tree, expansion.expanded_nodes, to_expand.nid, false, [tree])
+        tree
     end
     |> expand(rest ++ expansion.expanded_nodes, [to_expand | applied])
   end
@@ -89,13 +89,10 @@ defmodule Tableaux do
   defp invert_sign(:T), do: :F
   defp invert_sign(:F), do: :T
 
-  defp closed_path([], _) do
-    false
-  end
-
-  defp closed_path([{sign, string} | t], lst) do
-    Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end) ||
-      closed_path(t)
+  defp closes_path({sign, string}, lst) do
+    Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end)
+    ||
+    closed_path(lst)
   end
 
   defp closed_path([]), do: false
@@ -128,7 +125,7 @@ defmodule Tableaux do
     branch =
       list
       |> Enum.map(fn n ->
-        %RuleNode{n | closed: closed_path([{n.sign, n.string}], [tree | path])}
+        %RuleNode{n | closed: closes_path({n.sign, n.string}, [tree | path])}
       end)
       |> BinTree.linear_branch_from_list()
 
@@ -211,7 +208,7 @@ defmodule Tableaux do
               string: lstr,
               nid: lnid,
               source: lsource,
-              closed: closed_path([{lsign, lstr}], [tree | path])
+              closed: closes_path({lsign, lstr}, [tree | path])
             },
             right: %BinTree{
               value: rexp,
@@ -219,7 +216,7 @@ defmodule Tableaux do
               string: rstr,
               nid: rnid,
               source: rsource,
-              closed: closed_path([{rsign, rstr}], [tree | path])
+              closed: closes_path({rsign, rstr}, [tree | path])
             }
         }
 
