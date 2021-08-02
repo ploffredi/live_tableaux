@@ -34,19 +34,28 @@ defmodule TableauxRules do
     rule_type
   end
 
+  def get_expansion(application_queue, history) do
+    [to_expand | rest] =
+      application_queue
+      |> Enum.sort_by(&get_rule_type(&1.sign, &1.expression),&compare_operators(&1, &2))
+
+      {:ok, TableauxRules.get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history) + 1), to_expand , rest}
+  end
+
   @spec get_rule_expansion(TableauxNode.t(), integer()) :: RuleExpansion.t()
   def get_rule_expansion(
         %TableauxNode{
           sign: :F,
           string: _,
           expression: atom,
-          nid: _nid
+          nid: nid
         },
         _counter
       )
       when is_atom(atom),
       do: %RuleExpansion{
         rule_type: :alpha,
+        source_nid: nid,
         expanded_nodes: []
       }
 
@@ -55,13 +64,14 @@ defmodule TableauxRules do
           sign: :T,
           string: _,
           expression: atom,
-          nid: _nid
+          nid: nid
         },
         _counter
       )
       when is_atom(atom),
       do: %RuleExpansion{
         rule_type: :alpha,
+        source_nid: nid,
         expanded_nodes: []
       }
 
@@ -77,6 +87,7 @@ defmodule TableauxRules do
 
     %RuleExpansion{
       rule_type: rule_type,
+      source_nid: nid,
       expanded_nodes:
         Enum.zip(nodes_signs, [{expr1, counter}, {expr2, counter + 1}])
         |> Enum.map(fn {s, {e, c}} ->
@@ -103,6 +114,7 @@ defmodule TableauxRules do
 
     %RuleExpansion{
       rule_type: rule_type,
+      source_nid: nid,
       expanded_nodes:
         Enum.zip(nodes_signs, [{expr1, counter}])
         |> Enum.map(fn {s, {e, c}} ->
