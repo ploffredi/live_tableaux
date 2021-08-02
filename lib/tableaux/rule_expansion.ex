@@ -10,17 +10,13 @@ defmodule RuleExpansion do
   defstruct [:rule_type,:source_nid, :expanded_nodes]
 
 
-  def expand(tree, %RuleExpansion{rule_type: :atom, expanded_nodes: _}) do
-    tree
-  end
+  def expand(tree, %RuleExpansion{rule_type: :atom, expanded_nodes: _}), do: tree
 
-  def expand(tree, %RuleExpansion{rule_type: :beta, source_nid: nid, expanded_nodes: [left, right]}) do
+  def expand(tree, %RuleExpansion{rule_type: :beta, source_nid: nid, expanded_nodes: [left, right]}), do:
     expand_beta(tree, left, right, nid, false, [])
-  end
 
-  def expand(tree, %RuleExpansion{rule_type: :alpha, source_nid: nid, expanded_nodes: nodes}) do
+  def expand(tree, %RuleExpansion{rule_type: :alpha, source_nid: nid, expanded_nodes: nodes}), do:
     expand_alpha(tree, nodes, nid, false, [])
-  end
 
   @spec expand_alpha(nil | BinTree.t(), [TableauxNode.t()], nil | binary(), boolean(), [binary()]) ::
           BinTree.t()
@@ -28,9 +24,7 @@ defmodule RuleExpansion do
   Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
   need to create the first tree after the sequent parsing
   """
-  def expand_alpha(nil, _list, _ancestor, _ancestor_found, _path) do
-    nil
-  end
+  def expand_alpha(nil, _list, _ancestor, _ancestor_found, _path), do: nil
 
   def expand_alpha(
         %BinTree{value: %TableauxNode{nid: nid}=value, left: nil, right: nil} = tree,
@@ -39,7 +33,6 @@ defmodule RuleExpansion do
         ancestor_found,
         path
       ) do
-    # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha_leaf")
     is_closed_path = closed_path(path)
 
     branch =
@@ -69,8 +62,6 @@ defmodule RuleExpansion do
         ancestor_found,
         path
       ) do
-    # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha")
-
     if closed_path(path) do
       %BinTree{
         tree

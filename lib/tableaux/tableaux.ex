@@ -5,6 +5,13 @@ defmodule Tableaux do
 
   @spec verify(binary()) :: BinTree.t()
   def verify(sequent) do
+    sequent
+    |>expand_sequent()
+    |> is_closed()
+  end
+
+  @spec expand_sequent(binary) :: BinTree.t()
+  def expand_sequent(sequent) do
     nodes_list = SequentParser.parse(sequent) |> to_tableaux_nodes(0, 1)
     RuleExpansion.linear_branch_from_list(nodes_list)
     |> expand(nodes_list)
@@ -20,6 +27,19 @@ defmodule Tableaux do
 
     RuleExpansion.expand(tree, expansion)
     |> expand(remaining ++ expansion.expanded_nodes, [expanded | applied])
+  end
+
+
+  def is_closed(nil) do
+    true
+  end
+
+  def is_closed(%BinTree{value: %TableauxNode{closed: closed}, left: nil, right: nil}) do
+    closed
+  end
+
+  def is_closed(%BinTree{left: left, right: right}) do
+    is_closed(left) && is_closed(right)
   end
 
   @spec from_sequent(binary) :: BinTree.t()
