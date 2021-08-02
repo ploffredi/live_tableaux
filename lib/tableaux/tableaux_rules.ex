@@ -46,7 +46,6 @@ defmodule TableauxRules do
   defp get_rule_expansion(
         %TableauxNode{
           sign: :F,
-          string: _,
           expression: atom,
           nid: nid
         },
@@ -62,7 +61,6 @@ defmodule TableauxRules do
   defp get_rule_expansion(
         %TableauxNode{
           sign: :T,
-          string: _,
           expression: atom,
           nid: nid
         },

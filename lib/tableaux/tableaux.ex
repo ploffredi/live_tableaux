@@ -12,7 +12,7 @@ defmodule Tableaux do
 
   @spec expand_sequent(binary) :: BinTree.t()
   def expand_sequent(sequent) do
-    nodes_list = SequentParser.parse(sequent) |> to_tableaux_nodes(0, 1)
+    nodes_list = SequentParser.parse(sequent) |> TableauxNode.to_tableaux_nodes(0, 1)
     RuleExpansion.linear_branch_from_list(nodes_list)
     |> expand(nodes_list)
   end
@@ -52,37 +52,6 @@ defmodule Tableaux do
 
   @spec parse_sequent(binary) :: [TableauxNode.t()]
   def parse_sequent(sequent) do
-    sequent |> SequentParser.parse() |> to_tableaux_nodes(0, 1)
-  end
-
-  @spec to_tableaux_nodes([Expressions.expr()], integer(), integer()) :: [TableauxNode.t()]
-  defp to_tableaux_nodes([expression], step, idx) do
-    [
-      %TableauxNode{
-        expression: expression,
-        string: Expressions.expression_to_string(expression),
-        sign: :F,
-        step: step,
-        nid: idx,
-        source: nil,
-        closed: false
-      }
-    ]
-  end
-
-  defp to_tableaux_nodes([expression | t], step, idx) do
-    [
-      %TableauxNode{
-        expression: expression,
-        nid: idx,
-        sign: :T,
-        source: nil,
-        step: step,
-        string: Expressions.expression_to_string(expression),
-        closed: false
-      }
-      |
-      to_tableaux_nodes(t, step, idx + 1)
-    ]
+    sequent |> SequentParser.parse() |> TableauxNode.to_tableaux_nodes(0, 1)
   end
 end
