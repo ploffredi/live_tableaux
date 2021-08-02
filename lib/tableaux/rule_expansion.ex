@@ -49,8 +49,12 @@ defmodule RuleExpansion do
         ancestor_found,
         path
       ) do
-    is_closed_path = closed_path(path)
+    is_closed_path = closes_path({tree.value.sign, tree.value.string}, [value | path])
 
+    if (is_closed_path) do
+        IO.inspect tree
+         Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha_leaf")
+    end
     branch =
       list
       |> Enum.map(fn n ->
@@ -60,11 +64,16 @@ defmodule RuleExpansion do
 
     case (ancestor_found || nid == ancestor) && !is_closed_path do
       true ->
-        %BinTree{tree | left: branch}
+        if (is_closed_path) do
+          %BinTree{tree | left: nil, right: nil}
+        else
+          %BinTree{tree | left: branch}
+        end
+
 
       false ->
         if is_closed_path do
-          %BinTree{ tree | value: %TableauxNode{value | closed: true } }
+          %BinTree{ tree | value: %TableauxNode{value | closed: true} , left: nil, right: nil}
         else
           tree
         end
@@ -115,7 +124,7 @@ defmodule RuleExpansion do
         path
       ) do
     # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta_leaf")
-    is_closed_path = closed_path(path)
+    is_closed_path = closes_path({tree.value.sign, tree.value.string}, [value | path])
 
     case (ancestor_found || nid == ancestor) && !is_closed_path do
       true ->
@@ -131,7 +140,7 @@ defmodule RuleExpansion do
 
       false ->
         if is_closed_path do
-          %BinTree{tree | value: %TableauxNode{value| closed: true} }
+          %BinTree{tree | left: nil, right: nil, value: %TableauxNode{value| closed: true} }
         else
           tree
         end

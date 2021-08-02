@@ -39,17 +39,18 @@ defmodule TableauxRules do
         rule_type: :alpha,
         source_nid: 0,
         expanded_nodes:
-            Enum.with_index(application_queue, fn (el,index) -> %TableauxNode{el | nid: index+1} end)
+            Enum.with_index(application_queue, fn (el,index) -> %TableauxNode{el |source: 0, nid: index+1} end)
       }
       {:ok, expansion}
   end
 
   def get_expansion(application_queue, history) do
+    IO.inspect history
     [to_expand | rest] =
       application_queue
       |> Enum.sort_by(&get_rule_type(&1.sign, &1.expression),&compare_operators(&1, &2))
 
-      {:ok, get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history)), to_expand , rest}
+      {:ok, get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history)+ 1) , to_expand , rest}
   end
 
   @spec get_rule_expansion(TableauxNode.t(), integer()) :: RuleExpansion.t()

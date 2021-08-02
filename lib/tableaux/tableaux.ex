@@ -6,15 +6,14 @@ defmodule Tableaux do
   @spec verify(binary()) :: BinTree.t()
   def verify(sequent) do
     sequent
-    |>expand_sequent()
+    |> expand_sequent()
     |> is_closed()
   end
 
   @spec expand_sequent(binary) :: BinTree.t()
   def expand_sequent(sequent) do
     nodes_list = SequentParser.parse(sequent) |> TableauxNode.to_tableaux_nodes(0, 1)
-
-    nil |> expand(nodes_list)
+    expand(nil, nodes_list)
   end
 
   @spec expand(BinTree.t(), [TableauxNode.t()], [TableauxNode.t()]) :: BinTree.t()
@@ -29,7 +28,7 @@ defmodule Tableaux do
       RuleExpansion.expand(nil, expansion)
     else
       RuleExpansion.expand(nil, expansion)
-      |> expand(to_apply, to_apply)
+      |> expand(to_apply, [])
     end
   end
 
