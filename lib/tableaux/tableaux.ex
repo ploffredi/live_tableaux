@@ -36,7 +36,7 @@ defmodule Tableaux do
     sequent |> SequentParser.parse() |> to_tableaux_nodes(0, 1)
   end
 
-  @spec to_tableaux_nodes([Expressions.t()], integer(), integer()) :: [TableauxNode.t()]
+  @spec to_tableaux_nodes([Expressions.expr()], integer(), integer()) :: [TableauxNode.t()]
   defp to_tableaux_nodes([expression], step, idx) do
     [
       %TableauxNode{
@@ -45,7 +45,8 @@ defmodule Tableaux do
         sign: :F,
         step: step,
         nid: idx,
-        source: nil
+        source: nil,
+        closed: false
       }
     ]
   end
@@ -58,10 +59,11 @@ defmodule Tableaux do
         sign: :T,
         source: nil,
         step: step,
-        string: Expressions.expression_to_string(expression)
+        string: Expressions.expression_to_string(expression),
+        closed: false
       }
+      |
+      to_tableaux_nodes(t, step, idx + 1)
     ]
-    ++
-    to_tableaux_nodes(t, step, idx + 1)
   end
 end

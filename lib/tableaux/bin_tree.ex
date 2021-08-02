@@ -89,7 +89,7 @@ defmodule BinTree do
       do: %BinTree{value: node}
 
   def linear_branch_from_list([
-    %TableauxNode{}=node | t
+      %TableauxNode{}=node | t
       ]),
       do: %BinTree{
         value: node,

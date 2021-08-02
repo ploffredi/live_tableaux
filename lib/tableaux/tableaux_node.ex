@@ -2,12 +2,12 @@ defmodule TableauxNode do
   @type t :: %TableauxNode{
           expression: Expressions.expr(),
           string: binary(),
-          source: nil | binary(),
-          step: integer(),
+          source: nil | integer(),
+          step: nil | integer(),
           sign: :T | :F,
-          nid: binary(),
+          nid: nil | integer(),
           closed: boolean()
         }
 
-  defstruct [:expression, :string, :source, :step, :sign, nid: nil, closed: false]
+  defstruct [:expression, :string, :source, :sign, step: nil, nid: nil, closed: false]
 end
