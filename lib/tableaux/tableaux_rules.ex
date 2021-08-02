@@ -39,11 +39,11 @@ defmodule TableauxRules do
       application_queue
       |> Enum.sort_by(&get_rule_type(&1.sign, &1.expression),&compare_operators(&1, &2))
 
-      {:ok, TableauxRules.get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history) + 1), to_expand , rest}
+      {:ok, get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history) + 1), to_expand , rest}
   end
 
   @spec get_rule_expansion(TableauxNode.t(), integer()) :: RuleExpansion.t()
-  def get_rule_expansion(
+  defp get_rule_expansion(
         %TableauxNode{
           sign: :F,
           string: _,
@@ -59,7 +59,7 @@ defmodule TableauxRules do
         expanded_nodes: []
       }
 
-  def get_rule_expansion(
+  defp get_rule_expansion(
         %TableauxNode{
           sign: :T,
           string: _,
@@ -75,7 +75,7 @@ defmodule TableauxRules do
         expanded_nodes: []
       }
 
-  def get_rule_expansion(
+  defp get_rule_expansion(
         %TableauxNode{
           sign: sign,
           expression: {operator, expr1, expr2},
@@ -102,7 +102,7 @@ defmodule TableauxRules do
     }
   end
 
-  def get_rule_expansion(
+  defp get_rule_expansion(
         %TableauxNode{
           sign: sign,
           expression: {operator, expr1},

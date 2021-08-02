@@ -45,9 +45,9 @@ defmodule RuleExpansion do
     branch =
       list
       |> Enum.map(fn n ->
-        %TableauxNode{n | closed: closes_path({n.sign, n.string}, [tree | path])}
+        %TableauxNode{n | closed: closes_path({n.sign, n.string}, [value | path])}
       end)
-      |> BinTree.linear_branch_from_list()
+      |> RuleExpansion.linear_branch_from_list()
 
     case (ancestor_found || nid == ancestor) && !is_closed_path do
       true ->
@@ -82,11 +82,9 @@ defmodule RuleExpansion do
       %BinTree{
         tree
         | left:
-            expand_alpha(left, list, ancestor, ancestor_found || nid == ancestor, [tree | path]),
+            expand_alpha(left, list, ancestor, ancestor_found || nid == ancestor, [value | path]),
           right:
-            expand_alpha(right, list, ancestor, ancestor_found || nid == ancestor, [
-              tree | path
-            ])
+            expand_alpha(right, list, ancestor, ancestor_found || nid == ancestor, [value | path])
       }
     end
   end
@@ -117,10 +115,10 @@ defmodule RuleExpansion do
         %BinTree{
           tree
           | left: %BinTree{
-              value: %TableauxNode{ lnode | closed: closes_path({lsign, lstr}, [tree | path])},
+              value: %TableauxNode{ lnode | closed: closes_path({lsign, lstr}, [value | path])},
             },
             right: %BinTree{
-              value: %TableauxNode{ rnode | closed: closes_path({rsign, rstr}, [tree | path])},
+              value: %TableauxNode{ rnode | closed: closes_path({rsign, rstr}, [value | path])},
             }
         }
 
@@ -154,21 +152,51 @@ defmodule RuleExpansion do
         tree
         | left:
             expand_beta(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
-              tree | path
+              value | path
             ]),
           right:
             expand_beta(right, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
-              tree | path
+              value | path
             ])
       }
     end
   end
 
+  @spec linear_branch_from_list([TableauxNode.t()]) :: BinTree.t()
+  def linear_branch_from_list(list) do
+    is_closed=closed_path(list)
+    linear_branch_from_list_rec(list, is_closed)
+  end
+  @spec linear_branch_from_list_rec([TableauxNode.t()], boolean()) :: BinTree.t()
+  defp linear_branch_from_list_rec([], _), do: nil
+
+
+  defp linear_branch_from_list_rec([
+    %TableauxNode{}=node
+  ], true),
+  do: %BinTree{value: %TableauxNode{node|closed: true}}
+
+  defp linear_branch_from_list_rec([
+        %TableauxNode{}=node
+      ], _),
+      do: %BinTree{value: node}
+
+  defp linear_branch_from_list_rec([
+      %TableauxNode{}=node | t
+      ],closed)
+      do
+        %BinTree{
+        value: node,
+        left: linear_branch_from_list_rec(t, closed)
+      }
+    end
+
+
   defp invert_sign(:T), do: :F
   defp invert_sign(:F), do: :T
 
   defp closes_path({sign, string}, lst) do
-    Enum.any?(lst, fn e -> e.value.sign == invert_sign(sign) && e.value.string == string end)
+    Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end)
     ||
     closed_path(lst)
   end
@@ -176,7 +204,7 @@ defmodule RuleExpansion do
   defp closed_path([]), do: false
 
   defp closed_path([h | t]) do
-    Enum.any?(t, fn e -> e.value.sign == invert_sign(h.value.sign) && e.value.string == h.value.string end) ||
+    Enum.any?(t, fn e -> e.sign == invert_sign(h.sign) && e.string == h.string end) ||
       closed_path(t)
   end
 end

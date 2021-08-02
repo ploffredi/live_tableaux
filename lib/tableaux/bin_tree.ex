@@ -79,22 +79,6 @@ defmodule BinTree do
       %{name: get_full_name(tree), color: @node_color, children: [to_map(left), to_map(right)]}
     end
   end
-
-  @spec linear_branch_from_list([TableauxNode.t()]) :: BinTree.t()
-  def linear_branch_from_list([]), do: nil
-
-  def linear_branch_from_list([
-        %TableauxNode{}=node
-      ]),
-      do: %BinTree{value: node}
-
-  def linear_branch_from_list([
-      %TableauxNode{}=node | t
-      ]),
-      do: %BinTree{
-        value: node,
-        left: linear_branch_from_list(t)
-      }
 end
 
 # defimpl Inspect, for: BinTree do

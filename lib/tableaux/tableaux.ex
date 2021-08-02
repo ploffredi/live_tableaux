@@ -6,8 +6,7 @@ defmodule Tableaux do
   @spec verify(binary()) :: BinTree.t()
   def verify(sequent) do
     nodes_list = SequentParser.parse(sequent) |> to_tableaux_nodes(0, 1)
-
-    BinTree.linear_branch_from_list(nodes_list)
+    RuleExpansion.linear_branch_from_list(nodes_list)
     |> expand(nodes_list)
   end
 
@@ -28,7 +27,7 @@ defmodule Tableaux do
   Parses the given `sequent` into a binary tree.
   """
   def from_sequent(sequent) do
-    sequent |> parse_sequent() |> BinTree.linear_branch_from_list()
+    sequent |> parse_sequent() |> RuleExpansion.linear_branch_from_list()
   end
 
   @spec parse_sequent(binary) :: [TableauxNode.t()]
