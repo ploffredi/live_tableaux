@@ -52,8 +52,7 @@ defmodule RuleExpansion do
     is_closed_path =  closes_path(value, list)
 
     if (is_closed_path) do
-        IO.inspect tree
-         Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha_leaf")
+       # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "alpha_leaf")
     end
     branch =
       list

@@ -45,8 +45,7 @@ defmodule TableauxRules do
   end
 
   def get_expansion(application_queue, history) do
-    IO.inspect history
-    [to_expand | rest] =
+     [to_expand | rest] =
       application_queue
       |> Enum.sort_by(&get_rule_type(&1.sign, &1.expression),&compare_operators(&1, &2))
 
