@@ -3,7 +3,7 @@ defmodule ParserTest do
 
   test "parses a simple sequent" do
     assert Tableaux.parse_sequent("p->q,p|-q") == [
-             %RuleNode{
+             %TableauxNode{
                expression: {:implication, :p, :q},
                string: "p→q",
                sign: :T,
@@ -11,7 +11,7 @@ defmodule ParserTest do
                nid: 1,
                source: nil
              },
-             %RuleNode{
+             %TableauxNode{
                expression: :p,
                string: "p",
                sign: :T,
@@ -19,7 +19,7 @@ defmodule ParserTest do
                nid: 2,
                source: nil
              },
-             %RuleNode{
+             %TableauxNode{
                expression: :q,
                string: "q",
                sign: :F,
@@ -40,7 +40,7 @@ defmodule ParserTest do
 
   test "parses complex sequents" do
     assert Tableaux.parse_sequent("p&!q->r|t, t->q|!r, r&!q, p|t |- p->!r") == [
-             %RuleNode{
+             %TableauxNode{
                expression:
                  {:implication, {:conjunction, :p, {:negation, :q}}, {:disjunction, :r, :t}},
                sign: :T,
@@ -50,7 +50,7 @@ defmodule ParserTest do
                nid: 1,
                source: nil
              },
-             %RuleNode{
+             %TableauxNode{
                expression: {:implication, :t, {:disjunction, :q, {:negation, :r}}},
                sign: :T,
                string: "t→(q∨(¬r))",
@@ -59,7 +59,7 @@ defmodule ParserTest do
                nid: 2,
                source: nil
              },
-             %RuleNode{
+             %TableauxNode{
                expression: {:conjunction, :r, {:negation, :q}},
                sign: :T,
                string: "r∧(¬q)",
@@ -68,7 +68,7 @@ defmodule ParserTest do
                nid: 3,
                source: nil
              },
-             %RuleNode{
+             %TableauxNode{
                expression: {:disjunction, :p, :t},
                sign: :T,
                string: "p∨t",
@@ -77,7 +77,7 @@ defmodule ParserTest do
                nid: 4,
                source: nil
              },
-             %RuleNode{
+             %TableauxNode{
                expression: {:implication, :p, {:negation, :r}},
                sign: :F,
                string: "p→(¬r)",
