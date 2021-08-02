@@ -13,14 +13,25 @@ defmodule Tableaux do
   @spec expand_sequent(binary) :: BinTree.t()
   def expand_sequent(sequent) do
     nodes_list = SequentParser.parse(sequent) |> TableauxNode.to_tableaux_nodes(0, 1)
-    RuleExpansion.linear_branch_from_list(nodes_list)
-    |> expand(nodes_list)
+
+    nil |> expand(nodes_list)
   end
 
   @spec expand(BinTree.t(), [TableauxNode.t()], [TableauxNode.t()]) :: BinTree.t()
   def expand(tree, to_apply, applied \\ [])
 
   def expand(tree, [], _), do: tree
+
+  def expand(nil, to_apply, [] = _applied) do
+    {:ok, expansion} = TableauxRules.get_first_expansion(to_apply)
+
+    if RuleExpansion.closed_path(expansion.expanded_nodes) do
+      RuleExpansion.expand(nil, expansion)
+    else
+      RuleExpansion.expand(nil, expansion)
+      |> expand(to_apply, to_apply)
+    end
+  end
 
   def expand(tree, to_apply, applied) do
     {:ok, expansion, expanded, remaining} = TableauxRules.get_expansion(to_apply, applied)

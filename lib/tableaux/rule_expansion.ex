@@ -18,13 +18,29 @@ defmodule RuleExpansion do
   def expand(tree, %RuleExpansion{rule_type: :alpha, source_nid: nid, expanded_nodes: nodes}), do:
     expand_alpha(tree, nodes, nid, false, [])
 
-  @spec expand_alpha(nil | BinTree.t(), [TableauxNode.t()], nil | binary(), boolean(), [binary()]) ::
+  @spec expand_alpha(nil | BinTree.t(), [TableauxNode.t()], nil | integer(), boolean(), [integer()]) ::
           BinTree.t()
   @doc ~S"""
   Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
   need to create the first tree after the sequent parsing
   """
+
+  def expand_alpha(nil, list, _  ,_, []) do
+      count=Enum.count(list)
+      list
+      |> Enum.with_index(fn n,idx ->
+        if idx==count do
+          %TableauxNode{n | closed: closed_path(list)}
+        else
+          n
+        end
+      end)
+      |> RuleExpansion.linear_branch_from_list()
+
+  end
+
   def expand_alpha(nil, _list, _ancestor, _ancestor_found, _path), do: nil
+
 
   def expand_alpha(
         %BinTree{value: %TableauxNode{nid: nid}=value, left: nil, right: nil} = tree,
@@ -192,9 +208,9 @@ defmodule RuleExpansion do
     closed_path(lst)
   end
 
-  defp closed_path([]), do: false
+  def closed_path([]), do: false
 
-  defp closed_path([h | t]) do
+  def closed_path([h | t]) do
     Enum.any?(t, fn e -> e.sign == invert_sign(h.sign) && e.string == h.string end) ||
       closed_path(t)
   end
