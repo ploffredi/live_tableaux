@@ -34,39 +34,47 @@ defmodule TableauxRules do
     rule_type
   end
 
-  @spec get_rule_expansion(RuleNode.t(), integer()) :: RuleExpansion.t()
-  def get_rule_expansion(
-        %RuleNode{
+  def get_expansion(application_queue, history) do
+    [to_expand | rest] =
+      application_queue
+      |> Enum.sort_by(&get_rule_type(&1.sign, &1.expression),&compare_operators(&1, &2))
+
+      {:ok, get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history) + 1), to_expand , rest}
+  end
+
+  @spec get_rule_expansion(TableauxNode.t(), integer()) :: RuleExpansion.t()
+  defp get_rule_expansion(
+        %TableauxNode{
           sign: :F,
-          string: _,
           expression: atom,
-          nid: _nid
+          nid: nid
         },
         _counter
       )
       when is_atom(atom),
       do: %RuleExpansion{
         rule_type: :alpha,
+        source_nid: nid,
         expanded_nodes: []
       }
 
-  def get_rule_expansion(
-        %RuleNode{
+  defp get_rule_expansion(
+        %TableauxNode{
           sign: :T,
-          string: _,
           expression: atom,
-          nid: _nid
+          nid: nid
         },
         _counter
       )
       when is_atom(atom),
       do: %RuleExpansion{
         rule_type: :alpha,
+        source_nid: nid,
         expanded_nodes: []
       }
 
-  def get_rule_expansion(
-        %RuleNode{
+  defp get_rule_expansion(
+        %TableauxNode{
           sign: sign,
           expression: {operator, expr1, expr2},
           nid: nid
@@ -77,10 +85,11 @@ defmodule TableauxRules do
 
     %RuleExpansion{
       rule_type: rule_type,
+      source_nid: nid,
       expanded_nodes:
         Enum.zip(nodes_signs, [{expr1, counter}, {expr2, counter + 1}])
         |> Enum.map(fn {s, {e, c}} ->
-          %RuleNode{
+          %TableauxNode{
             sign: s,
             string: Expressions.expression_to_string(e),
             expression: e,
@@ -91,8 +100,8 @@ defmodule TableauxRules do
     }
   end
 
-  def get_rule_expansion(
-        %RuleNode{
+  defp get_rule_expansion(
+        %TableauxNode{
           sign: sign,
           expression: {operator, expr1},
           nid: nid
@@ -103,10 +112,11 @@ defmodule TableauxRules do
 
     %RuleExpansion{
       rule_type: rule_type,
+      source_nid: nid,
       expanded_nodes:
         Enum.zip(nodes_signs, [{expr1, counter}])
         |> Enum.map(fn {s, {e, c}} ->
-          %RuleNode{
+          %TableauxNode{
             sign: s,
             string: Expressions.expression_to_string(e),
             expression: e,
