@@ -33,6 +33,7 @@ defmodule LiveTableauxWeb.TableauxLive do
 
   @impl true
   def handle_event("expand", %{"q" => sequent}, socket) do
+    IO.inspect(Tableaux.expand_sequent(sequent))
     {:noreply,
      push_event(socket, "updateResultTree", Tableaux.expand_sequent(sequent) |> BinTree.to_map())}
   end
