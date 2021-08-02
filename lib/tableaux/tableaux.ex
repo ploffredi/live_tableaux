@@ -36,6 +36,7 @@ defmodule Tableaux do
     sequent |> SequentParser.parse() |> to_tableaux_nodes(0, 1)
   end
 
+  @spec to_tableaux_nodes([Expressions.t()], integer(), integer()) :: [TableauxNode.t()]
   defp to_tableaux_nodes([expression], step, idx) do
     [
       %TableauxNode{
@@ -59,7 +60,8 @@ defmodule Tableaux do
         step: step,
         string: Expressions.expression_to_string(expression)
       }
-      | to_tableaux_nodes(t, step, idx + 1)
     ]
+    ++
+    to_tableaux_nodes(t, step, idx + 1)
   end
 end
