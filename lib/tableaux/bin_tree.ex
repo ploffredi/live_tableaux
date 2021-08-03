@@ -19,7 +19,9 @@ defmodule BinTree do
 
   defstruct [:value, :left, :right]
 
-  defp get_full_name(%BinTree{value: %TableauxNode{string: string, sign: sign, nid: nid, source: source}}) do
+  defp get_full_name(%BinTree{
+         value: %TableauxNode{string: string, sign: sign, nid: nid, source: source}
+       }) do
     source = if !is_nil(source), do: "#{source}:", else: ""
     "#{sign} #{string}    [#{source}#{nid}]"
   end
@@ -28,7 +30,7 @@ defmodule BinTree do
         %BinTree{
           left: nil,
           right: nil,
-          value: %TableauxNode{closed: closed }
+          value: %TableauxNode{closed: closed}
         } = tree
       ) do
     if closed do
@@ -42,7 +44,7 @@ defmodule BinTree do
         %BinTree{
           left: left,
           right: nil,
-          value: %TableauxNode{closed: closed }
+          value: %TableauxNode{closed: closed}
         } = tree
       ) do
     if closed do
@@ -56,7 +58,7 @@ defmodule BinTree do
         %BinTree{
           left: nil,
           right: right,
-          value: %TableauxNode{closed: closed }
+          value: %TableauxNode{closed: closed}
         } = tree
       ) do
     if closed do
@@ -70,7 +72,7 @@ defmodule BinTree do
         %BinTree{
           left: left,
           right: right,
-          value: %TableauxNode{closed: closed }
+          value: %TableauxNode{closed: closed}
         } = tree
       ) do
     if closed do
@@ -81,14 +83,17 @@ defmodule BinTree do
   end
 end
 
- defimpl Inspect, for: BinTree do
+defimpl Inspect, for: BinTree do
   import Inspect.Algebra
 
   # A custom inspect instance purely for the tests, this makes error messages
   # much more readable.
   #
   # BinTree[value: 3, left: BinTree[value: 5, right: BinTree[value: 6]]] becomes (3:(5::(6::)):)
-  def inspect(%BinTree{value: %TableauxNode{ string: value, sign: sign}, left: left, right: right}, opts) do
+  def inspect(
+        %BinTree{value: %TableauxNode{string: value, sign: sign}, left: left, right: right},
+        opts
+      ) do
     concat([
       "(",
       to_doc("#{sign} #{value}", opts),
@@ -99,4 +104,4 @@ end
       ")"
     ])
   end
- end
+end

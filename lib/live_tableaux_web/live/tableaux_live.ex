@@ -4,7 +4,7 @@ defmodule LiveTableauxWeb.TableauxLive do
   @samples [
     "p|q,q|-q",
     "|-(p∨(q∧r))→((p∨q)∧(p∨r))",
-    "p∨q|-(p∨(q∧r))→((p∨q)∧(p∨r))",
+    "p∨q|-(p∨(q∧r))→((p∨q)∧(p∨r))"
   ]
   @impl true
   def mount(_params, _session, socket) do
@@ -49,10 +49,9 @@ defmodule LiveTableauxWeb.TableauxLive do
 
   @impl true
   def handle_event("sample_selected", %{"sample" => sequent}, socket) do
-    socket=assign(socket, sequent: sequent)
+    socket = assign(socket, sequent: sequent)
+
     {:noreply,
      push_event(socket, "updateResultTree", Tableaux.expand_sequent(sequent) |> BinTree.to_map())}
   end
-
-
 end

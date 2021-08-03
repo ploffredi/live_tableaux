@@ -37,8 +37,7 @@ defmodule TableauxNode do
         string: Expressions.expression_to_string(expression),
         closed: false
       }
-      |
-      to_tableaux_nodes(t, step, idx + 1)
+      | to_tableaux_nodes(t, step, idx + 1)
     ]
   end
 end

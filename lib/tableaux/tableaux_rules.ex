@@ -35,62 +35,66 @@ defmodule TableauxRules do
   end
 
   def get_first_expansion(application_queue) do
-      expansion = %RuleExpansion{
-        rule_type: :alpha,
-        source_nid: 0,
-        expanded_nodes:
-            Enum.with_index(application_queue, fn (el,index) -> %TableauxNode{el |source: 0, nid: index+1} end)
-      }
-      {:ok, expansion}
+    expansion = %RuleExpansion{
+      rule_type: :alpha,
+      source_nid: 0,
+      expanded_nodes:
+        Enum.with_index(application_queue, fn el, index ->
+          %TableauxNode{el | source: 0, nid: index + 1}
+        end)
+    }
+
+    {:ok, expansion}
   end
 
   def get_expansion(application_queue, history) do
-     [to_expand | rest] =
+    [to_expand | rest] =
       application_queue
-      |> Enum.sort_by(&get_rule_type(&1.sign, &1.expression),&compare_operators(&1, &2))
+      |> Enum.sort_by(&get_rule_type(&1.sign, &1.expression), &compare_operators(&1, &2))
 
-      {:ok, get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history)+ 1) , to_expand , rest}
+    {:ok, get_rule_expansion(to_expand, Enum.count(application_queue) + Enum.count(history) + 1),
+     to_expand, rest}
   end
 
   @spec get_rule_expansion(TableauxNode.t(), integer()) :: RuleExpansion.t()
   defp get_rule_expansion(
-        %TableauxNode{
-          sign: :F,
-          expression: atom,
-          nid: nid
-        },
-        _counter
-      )
-      when is_atom(atom),
-      do: %RuleExpansion{
-        rule_type: :alpha,
-        source_nid: nid,
-        expanded_nodes: []
-      }
+         %TableauxNode{
+           sign: :F,
+           expression: atom,
+           nid: nid
+         },
+         _counter
+       )
+       when is_atom(atom),
+       do: %RuleExpansion{
+         rule_type: :alpha,
+         source_nid: nid,
+         expanded_nodes: []
+       }
 
   defp get_rule_expansion(
-        %TableauxNode{
-          sign: :T,
-          expression: atom,
-          nid: nid
-        },
-        _counter
-      )
-      when is_atom(atom),
-      do: %RuleExpansion{
-        rule_type: :alpha,
-        source_nid: nid,
-        expanded_nodes: []
-      }
+         %TableauxNode{
+           sign: :T,
+           expression: atom,
+           nid: nid
+         },
+         _counter
+       )
+       when is_atom(atom),
+       do: %RuleExpansion{
+         rule_type: :alpha,
+         source_nid: nid,
+         expanded_nodes: []
+       }
 
   defp get_rule_expansion(
-        %TableauxNode{
-          sign: sign,
-          expression: {operator, expr1, expr2},
-          nid: nid
-        },
-        counter
-      ) do
+         %TableauxNode{
+           sign: sign,
+           expression: {operator, expr1, expr2},
+           nid: nid
+         },
+         counter
+       ) do
     {rule_type, nodes_signs} = Map.get(@expansion_rules, {sign, operator})
 
     %RuleExpansion{
@@ -111,13 +115,13 @@ defmodule TableauxRules do
   end
 
   defp get_rule_expansion(
-        %TableauxNode{
-          sign: sign,
-          expression: {operator, expr1},
-          nid: nid
-        },
-        counter
-      ) do
+         %TableauxNode{
+           sign: sign,
+           expression: {operator, expr1},
+           nid: nid
+         },
+         counter
+       ) do
     {rule_type, nodes_signs} = Map.get(@expansion_rules, {sign, operator})
 
     %RuleExpansion{

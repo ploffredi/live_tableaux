@@ -47,8 +47,7 @@ defmodule LiveTableaux.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:uuid, "~> 1.1"},
-      {:nanoid, "~> 2.0.5"}
+      {:propcheck, "~> 1.4", only: [:dev, :test]}
     ]
   end
 

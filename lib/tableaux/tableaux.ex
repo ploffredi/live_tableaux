@@ -34,10 +34,10 @@ defmodule Tableaux do
 
   def expand(tree, to_apply, applied) do
     {:ok, expansion, expanded, remaining} = TableauxRules.get_expansion(to_apply, applied)
+
     RuleExpansion.expand(tree, expansion)
     |> expand(remaining ++ expansion.expanded_nodes, [expanded | applied])
   end
-
 
   def is_closed(nil) do
     true
