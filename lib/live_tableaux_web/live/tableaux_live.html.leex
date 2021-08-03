@@ -15,5 +15,15 @@
     <button type="submit" phx-disable-with="Expanding...">Expand sequent</button>
   </form>
 
+<form phx-change="sample_selected" phx-submit="expand">
+  <select name="sample" id="select_countries">
+        <option value="">None</option>
+        <%= for c <- @samples do %>
+          <option value="<%= c %>">
+            <%= c %>
+          </option>
+        <% end %>
+      </select>
+</form>
  <div id="d3-result" phx-hook="D3Tree" phx-update="ignore">
 </section>
