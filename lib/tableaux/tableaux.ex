@@ -10,6 +10,13 @@ defmodule Tableaux do
     |> is_closed()
   end
 
+  def is_valid?(sequent) do
+    sequent
+    |> expand_sequent()
+    |> is_closed()
+  end
+
+
   @spec expand_sequent(binary) :: BinTree.t()
   def expand_sequent(sequent) do
     nodes_list = SequentParser.parse(sequent) |> TableauxNode.to_tableaux_nodes(0, 1)
