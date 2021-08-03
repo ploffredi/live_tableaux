@@ -1,4 +1,4 @@
-defmodule PbtTest do
+defmodule TableauxPbtTest do
   use ExUnit.Case
   use PropCheck
 
@@ -20,7 +20,7 @@ defmodule PbtTest do
     forall p <- proposition() do
       collect(
         Tableaux.is_valid?(
-          "(" <> p <> ")|-(" <> p <> ")"
+          "|-(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))"
         ),
         type_of_nexus(p)
       )

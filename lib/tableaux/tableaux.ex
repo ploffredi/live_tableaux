@@ -3,7 +3,7 @@ defmodule Tableaux do
   Documentation for `Tableaux`.
   """
 
-  @spec verify(binary()) :: BinTree.t()
+  @spec verify(binary()) :: boolean()
   def verify(sequent) do
     sequent
     |> expand_sequent()
@@ -17,7 +17,6 @@ defmodule Tableaux do
   end
 
 
-  @spec expand_sequent(binary) :: BinTree.t()
   def expand_sequent(sequent) do
     nodes_list = SequentParser.parse(sequent) |> TableauxNode.to_tableaux_nodes(0, 1)
     expand(nil, nodes_list)
