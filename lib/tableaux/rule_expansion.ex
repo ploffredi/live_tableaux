@@ -39,7 +39,7 @@ defmodule RuleExpansion do
 
   end
 
-  def expand_alpha(nil, _list, _ancestor, _ancestor_found, _path), do: nil
+  def expand_alpha(nil, _, _, _, _), do: nil
 
 
   def expand_alpha(
@@ -132,8 +132,10 @@ defmodule RuleExpansion do
     # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta_leaf")
     is_closed_path = closes_path(value,path)
 
-    case (ancestor_found || nid == ancestor) && !is_closed_path do
-      true ->
+    if (is_closed_path) do
+      %BinTree{tree | value: %TableauxNode{value | closed: true}, left: nil, right: nil}
+    else
+      if ancestor_found || nid == ancestor do
         %BinTree{
           tree
           | left: %BinTree{
@@ -143,13 +145,9 @@ defmodule RuleExpansion do
               value: %TableauxNode{ rnode | closed: closes_path(rnode, [value | path])},
             }
         }
-
-      false ->
-        if is_closed_path do
-          %BinTree{tree | left: nil, right: nil, value: %TableauxNode{value| closed: true} }
-        else
-          tree
-        end
+      else
+        tree
+      end
     end
   end
 
