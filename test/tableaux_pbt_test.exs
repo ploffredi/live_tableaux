@@ -6,11 +6,12 @@ defmodule TableauxPbtTest do
   @conjunction " ∧ "
   @disjunction " ∨ "
   @implication " → "
+  @assertion "|-"
 
   property "a simple proposition is not verifiable", [:verbose, numtests: 1000] do
     forall p <- simple_proposition() do
       # collect(
-      not Tableaux.is_valid?("|-" <> p)
+      not Tableaux.is_valid?(@assertion <> p)
       #  p
       # )
     end
@@ -20,16 +21,23 @@ defmodule TableauxPbtTest do
     forall p <- proposition() do
       collect(
         Tableaux.is_valid?(
-          "|-(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))"
+          @assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))"
         ),
         type_of_nexus(p)
       )
     end
   end
 
+  property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify" do
+    forall p <- proposition() do
+      Tableaux.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
+    end
+  end
+
+
   property "a proposition always implies itself" do
     forall p <- proposition() do
-      Tableaux.is_valid?("|-(" <> p <> ")" <> @implication <> "(" <> p <> ")")
+      Tableaux.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
     end
   end
 
