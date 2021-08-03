@@ -43,9 +43,16 @@ defmodule LiveTableauxWeb.TableauxLive do
   end
 
   @impl true
+  def handle_event("sample_selected", %{"sample" => ""}, socket) do
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("sample_selected", %{"sample" => sequent}, socket) do
     socket=assign(socket, sequent: sequent)
     {:noreply,
      push_event(socket, "updateResultTree", Tableaux.expand_sequent(sequent) |> BinTree.to_map())}
   end
+
+
 end

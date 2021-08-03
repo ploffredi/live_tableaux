@@ -17,7 +17,7 @@
 
 <form phx-change="sample_selected" phx-submit="expand">
   <select name="sample" id="select_countries">
-        <option value="">None</option>
+        <option value="">Samples</option>
         <%= for c <- @samples do %>
           <option value="<%= c %>">
             <%= c %>
