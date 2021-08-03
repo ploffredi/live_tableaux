@@ -28,12 +28,9 @@ defmodule RuleExpansion do
   def expand_alpha(nil, list, _  ,_, []) do
       count=Enum.count(list)
       list
-      |> Enum.with_index(fn n,idx ->
-        if idx==count do
-          %TableauxNode{n | closed: closes_path(n, list)}
-        else
-          n
-        end
+      |> Enum.with_index(fn
+        n, ^count=_ -> %TableauxNode{n | closed: closes_path(n, list)}
+        n, _ -> n
       end)
       |> RuleExpansion.linear_branch_from_list()
 
