@@ -18,7 +18,7 @@ defmodule Tableaux do
 
 
   def expand_sequent(sequent) do
-    nodes_list = SequentParser.parse(sequent) |> TableauxNode.to_tableaux_nodes(0, 1)
+    nodes_list = SequentParser.parse(sequent)
     expand(nil, nodes_list)
   end
 
@@ -28,13 +28,9 @@ defmodule Tableaux do
   def expand(tree, [], _), do: tree
 
   def expand(nil, to_apply, [] = _applied) do
-    {:ok, expansion} = TableauxRules.get_first_expansion(to_apply)
-
-    if RuleExpansion.closed_path(expansion.expanded_nodes) do
-      RuleExpansion.expand(nil, expansion)
-    else
-      RuleExpansion.expand(nil, expansion)
-      |> expand(to_apply, [])
+    case RuleExpansion.closed_path(to_apply)  do
+       true -> RuleExpansion.linear_branch_from_list(to_apply)
+       false -> RuleExpansion.linear_branch_from_list(to_apply) |> expand(to_apply, [])
     end
   end
 
@@ -45,6 +41,7 @@ defmodule Tableaux do
     |> expand(remaining ++ expansion.expanded_nodes, [expanded | applied])
   end
 
+  @spec is_closed(nil | BinTree.t()) :: boolean()
   def is_closed(nil) do
     true
   end
@@ -67,6 +64,6 @@ defmodule Tableaux do
 
   @spec parse_sequent(binary) :: [TableauxNode.t()]
   def parse_sequent(sequent) do
-    sequent |> SequentParser.parse() |> TableauxNode.to_tableaux_nodes(0, 1)
+    sequent |> SequentParser.parse()
   end
 end

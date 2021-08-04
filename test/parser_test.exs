@@ -9,7 +9,7 @@ defmodule ParserTest do
                sign: :T,
                step: 0,
                nid: 1,
-               source: nil
+               source: 0
              },
              %TableauxNode{
                expression: :p,
@@ -17,7 +17,7 @@ defmodule ParserTest do
                sign: :T,
                step: 0,
                nid: 2,
-               source: nil
+               source: 0
              },
              %TableauxNode{
                expression: :q,
@@ -25,7 +25,7 @@ defmodule ParserTest do
                sign: :F,
                step: 0,
                nid: 3,
-               source: nil
+               source: 0
              }
            ]
   end
@@ -48,7 +48,7 @@ defmodule ParserTest do
                sign: :T,
                step: 0,
                nid: 1,
-               source: nil
+               source: 0
              },
              %TableauxNode{
                expression: {:implication, :t, {:disjunction, :q, {:negation, :r}}},
@@ -57,7 +57,7 @@ defmodule ParserTest do
                sign: :T,
                step: 0,
                nid: 2,
-               source: nil
+               source: 0
              },
              %TableauxNode{
                expression: {:conjunction, :r, {:negation, :q}},
@@ -66,7 +66,7 @@ defmodule ParserTest do
                sign: :T,
                step: 0,
                nid: 3,
-               source: nil
+               source: 0
              },
              %TableauxNode{
                expression: {:disjunction, :p, :t},
@@ -75,7 +75,7 @@ defmodule ParserTest do
                sign: :T,
                step: 0,
                nid: 4,
-               source: nil
+               source: 0
              },
              %TableauxNode{
                expression: {:implication, :p, {:negation, :r}},
@@ -84,7 +84,7 @@ defmodule ParserTest do
                sign: :F,
                step: 0,
                nid: 5,
-               source: nil
+               source: 0
              }
            ]
   end

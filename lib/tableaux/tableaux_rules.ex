@@ -34,19 +34,6 @@ defmodule TableauxRules do
     rule_type
   end
 
-  def get_first_expansion(application_queue) do
-    expansion = %RuleExpansion{
-      rule_type: :alpha,
-      source_nid: 0,
-      expanded_nodes:
-        Enum.with_index(application_queue, fn el, index ->
-          %TableauxNode{el | source: 0, nid: index + 1}
-        end)
-    }
-
-    {:ok, expansion}
-  end
-
   def get_expansion(application_queue, history) do
     [to_expand | rest] =
       application_queue

@@ -25,19 +25,31 @@ elems -> atom : extract_token('$1').
 
 
 sequent -> assertion descendant : '$2'.
-sequent -> ascendants assertion descendant : '$1' ++ '$3'.
+sequent -> ascendants assertion descendant : map_index('$1' ++ '$3',1).
 
 
-descendant -> elems : ['$1'].
+descendant -> elems : ['Elixir.TableauxNode':'__struct__'(#{expression => '$1', step => 0, source => 0, sign => 'F', string => 'Elixir.Expressions':expression_to_string('$1')})].
 
 ascendants -> ascendant : ['$1'].
 ascendants -> ascendant separator ascendants : ['$1'|'$3'].
-ascendant -> elems : '$1'.
+ascendant -> elems : 'Elixir.TableauxNode':'__struct__'(#{expression => '$1', step => 0, source => 0, sign => 'T', string => 'Elixir.Expressions':expression_to_string('$1')}).
 
-
-neg -> negation elems : {extract_token('$1'), '$2'}.   
+neg -> negation elems :  {extract_token('$1'), '$2'}.   
 
 
 Erlang code.
 
 extract_token({_Token, _Line, Value}) -> Value.
+
+
+map_index(Nodes, Idx) -> 
+  case Nodes of
+    [] ->
+      none;
+    [H] ->
+      [with_index(H, Idx)];
+    [H | T] ->  %% Switched
+      [with_index(H, Idx)|map_index(T, Idx + 1)]
+  end.
+
+with_index(Node, Idx) -> maps:update('nid', Idx, Node).

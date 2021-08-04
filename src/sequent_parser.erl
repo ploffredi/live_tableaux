@@ -1,9 +1,22 @@
 -module(sequent_parser).
 -export([parse/1, parse_and_scan/1, format_error/1]).
--file("src/sequent_parser.yrl", 41).
+-file("src/sequent_parser.yrl", 40).
 
 extract_token({_Token, _Line, Value}) -> Value.
--file("/Users/ploffredi/.asdf/installs/erlang/24.0.3/lib/parsetools-2.3/include/yeccpre.hrl", 0).
+
+
+map_index(Nodes, Idx) -> 
+  case Nodes of
+    [] ->
+      none;
+    [H] ->
+      [with_index(H, Idx)];
+    [H | T] ->  %% Switched
+      [with_index(H, Idx)|map_index(T, Idx + 1)]
+  end.
+
+with_index(Node, Idx) -> maps:update('nid', Idx, Node).
+-file("/Users/ploffredi/.asdf/installs/erlang/24.0.5/lib/parsetools-2.3/include/yeccpre.hrl", 0).
 %%
 %% %CopyrightBegin%
 %%
@@ -173,7 +186,7 @@ yecctoken2string(Other) ->
 
 
 
--file("src/sequent_parser.erl", 176).
+-file("src/sequent_parser.erl", 189).
 
 -dialyzer({nowarn_function, yeccpars2/7}).
 yeccpars2(0=S, Cat, Ss, Stack, T, Ts, Tzr) ->
@@ -437,7 +450,7 @@ yeccpars2_2_(__Stack0) ->
 yeccpars2_3_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-                     ___1
+                     'Elixir.TableauxNode':'__struct__'(#{expression => ___1, step => 0, source => 0, sign => 'T', string => 'Elixir.Expressions':expression_to_string(___1)})
   end | __Stack].
 
 -compile({inline,yeccpars2_5_/1}).
@@ -457,11 +470,11 @@ yeccpars2_8_(__Stack0) ->
   end | __Stack].
 
 -compile({inline,yeccpars2_10_/1}).
--file("src/sequent_parser.yrl", 34).
+-file("src/sequent_parser.yrl", 33).
 yeccpars2_10_(__Stack0) ->
  [___2,___1 | __Stack] = __Stack0,
  [begin
-                        {extract_token(___1), ___2}
+                         {extract_token(___1), ___2}
   end | __Stack].
 
 -compile({inline,yeccpars2_14_/1}).
@@ -493,7 +506,7 @@ yeccpars2_16_(__Stack0) ->
 yeccpars2_17_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-                      [___1]
+                      ['Elixir.TableauxNode':'__struct__'(#{expression => ___1, step => 0, source => 0, sign => 'F', string => 'Elixir.Expressions':expression_to_string(___1)})]
   end | __Stack].
 
 -compile({inline,yeccpars2_18_/1}).
@@ -525,8 +538,8 @@ yeccpars2_22_(__Stack0) ->
 yeccpars2_24_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
-                                             ___1 ++ ___3
+                                             map_index(___1 ++ ___3,1)
   end | __Stack].
 
 
--file("src/sequent_parser.yrl", 43).
+-file("src/sequent_parser.yrl", 55).
