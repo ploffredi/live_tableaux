@@ -8,7 +8,7 @@ defmodule TableauxSimplifiedPbtTest do
   @implication " → "
   @assertion "|-"
 
-  property "a simple proposition is not verifiable", [:verbose, numtests: 100] do
+  property "a simple proposition is not verifiable", [:verbose, numtests: 10] do
     forall p <- simple_proposition() do
       # collect(
       not TableauxSimplified.is_valid?(@assertion <> p)
@@ -17,7 +17,7 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "either a proposition or its negation is always verifiable", [:verbose, numtests: 100] do
+  property "either a proposition or its negation is always verifiable", [:verbose, numtests: 10] do
     forall p <- proposition() do
       #IO.inspect(@assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))", label: "sequent")
       collect(
