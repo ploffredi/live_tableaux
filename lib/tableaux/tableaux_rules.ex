@@ -129,8 +129,8 @@ defmodule TableauxRules do
   end
 
   def sort_queue(l) do
-    l|>
-    Enum.sort_by(
+    l
+    |> Enum.sort_by(
       &TableauxRules.get_rule_type(&1.sign, &1.expression),
       &TableauxRules.compare_operators(&1, &2)
     )

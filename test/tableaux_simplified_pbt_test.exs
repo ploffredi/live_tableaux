@@ -42,6 +42,13 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
+  property "the results must be consistent with the the bintree based implementation",
+           [:verbose, numtests: @numtests] do
+    forall p <- proposition() do
+      TableauxSimplified.is_valid?( @assertion <> "(" <> p <> ")") == Tableaux.is_valid?( @assertion <> "(" <> p <> ")")
+    end
+  end
+
   property "a proposition always implies itself", [:verbose, numtests: @numtests] do
     forall p <- proposition() do
       TableauxSimplified.is_valid?(
