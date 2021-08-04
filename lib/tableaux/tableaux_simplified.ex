@@ -19,7 +19,7 @@ defmodule TableauxSimplified do
       unexpandable?(l) ->
         false
       atom?(h) ->
-        t++[h] |> cleanup() |> closes?()
+        t++[h] |> closes?()
       alpha?(h) ->
         nodes=expand_alpha(h)
         t++nodes |> cleanup() |> closes?()
@@ -65,6 +65,7 @@ defmodule TableauxSimplified do
 
   def cleanup(l) do
     Enum.uniq_by(l, fn el -> "#{el.sign} #{el.string}" end)
+    |> Enum.sort_by(&TableauxRules.get_rule_type(&1.sign, &1.expression), &TableauxRules.compare_operators(&1, &2))
   end
 
 
