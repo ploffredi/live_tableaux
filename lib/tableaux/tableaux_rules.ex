@@ -44,7 +44,7 @@ defmodule TableauxRules do
   end
 
   @spec get_rule_expansion(TableauxNode.t(), integer()) :: RuleExpansion.t()
-  defp get_rule_expansion(
+  def get_rule_expansion(
          %TableauxNode{
            sign: :F,
            expression: atom,
@@ -59,7 +59,7 @@ defmodule TableauxRules do
          expanded_nodes: []
        }
 
-  defp get_rule_expansion(
+  def get_rule_expansion(
          %TableauxNode{
            sign: :T,
            expression: atom,
@@ -74,7 +74,7 @@ defmodule TableauxRules do
          expanded_nodes: []
        }
 
-  defp get_rule_expansion(
+  def get_rule_expansion(
          %TableauxNode{
            sign: sign,
            expression: {operator, expr1, expr2},
@@ -101,7 +101,7 @@ defmodule TableauxRules do
     }
   end
 
-  defp get_rule_expansion(
+  def get_rule_expansion(
          %TableauxNode{
            sign: sign,
            expression: {operator, expr1},

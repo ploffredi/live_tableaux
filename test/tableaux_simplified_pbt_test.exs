@@ -1,4 +1,4 @@
-defmodule TableauxPbtTest do
+defmodule TableauxSimplifiedPbtTest do
   use ExUnit.Case
   use PropCheck
 
@@ -11,7 +11,7 @@ defmodule TableauxPbtTest do
   property "a simple proposition is not verifiable", [:verbose, numtests: 100] do
     forall p <- simple_proposition() do
       # collect(
-      not Tableaux.is_valid?(@assertion <> p)
+      not TableauxSimplified.is_valid?(@assertion <> p)
       #  p
       # )
     end
@@ -19,8 +19,9 @@ defmodule TableauxPbtTest do
 
   property "either a proposition or its negation is always verifiable", [:verbose, numtests: 100] do
     forall p <- proposition() do
+      #IO.inspect(@assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))", label: "sequent")
       collect(
-        Tableaux.is_valid?(
+        TableauxSimplified.is_valid?(
           @assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))"
         ),
         type_of_nexus(p)
@@ -30,14 +31,14 @@ defmodule TableauxPbtTest do
 
   property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify" do
     forall p <- proposition() do
-      Tableaux.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
+      TableauxSimplified.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
     end
   end
 
 
   property "a proposition always implies itself" do
     forall p <- proposition() do
-      Tableaux.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
+      TableauxSimplified.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
     end
   end
 
