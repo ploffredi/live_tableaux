@@ -1,5 +1,5 @@
 defmodule TableauxPbtTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   use PropCheck
 
   @negation " ¬ "
@@ -19,12 +19,13 @@ defmodule TableauxPbtTest do
 
   property "either a proposition or its negation is always verifiable", [:verbose, numtests: 100] do
     forall p <- proposition() do
-      collect(
+      #collect(
         Tableaux.is_valid?(
           @assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))"
-        ),
-        type_of_nexus(p)
-      )
+        )
+      #  ,
+      #  type_of_nexus(p)
+      #)
     end
   end
 
