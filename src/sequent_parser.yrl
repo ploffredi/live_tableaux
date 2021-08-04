@@ -48,7 +48,7 @@ map_index(Nodes, Idx) ->
       none;
     [H] ->
       [with_index(H, Idx)];
-    [H | T] ->  %% Switched
+    [H | T] -> 
       [with_index(H, Idx)|map_index(T, Idx + 1)]
   end.
 
