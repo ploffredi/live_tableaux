@@ -12,33 +12,38 @@ defmodule TableauxSimplified do
     true
   end
 
-  def closes?([h|t]=l) do
+  def closes?([h | t] = l) do
     cond do
       closed?(l) ->
         true
+
       unexpandable?(l) ->
         false
+
       atom?(h) ->
-        t++[h] |> closes?()
+        (t ++ [h]) |> closes?()
+
       alpha?(h) ->
-        nodes=expand_alpha(h)
-        t++nodes |> cleanup() |> closes?()
+        nodes = expand_alpha(h)
+        (t ++ nodes) |> cleanup() |> closes?()
+
       beta?(h) ->
-        {n1, n2}=expand_beta(h)
-        closes?(t++[n1]|> cleanup()) && closes?(t++[n2]|> cleanup())
+        {n1, n2} = expand_beta(h)
+        closes?((t ++ [n1]) |> cleanup()) && closes?((t ++ [n2]) |> cleanup())
+
       true ->
-          raise "unknown case"
+        raise "unknown case"
     end
   end
 
   def expand_alpha(n) do
-    %{ expanded_nodes: expanded_nodes } = TableauxRules.get_rule_expansion(n,0)
+    %{expanded_nodes: expanded_nodes} = TableauxRules.get_rule_expansion(n, 0)
 
     expanded_nodes
   end
 
-   def expand_beta(n) do
-    %{ expanded_nodes: [n1, n2] } = TableauxRules.get_rule_expansion(n,0)
+  def expand_beta(n) do
+    %{expanded_nodes: [n1, n2]} = TableauxRules.get_rule_expansion(n, 0)
     {n1, n2}
   end
 
@@ -49,7 +54,6 @@ defmodule TableauxSimplified do
   def closed?(l) do
     RuleExpansion.closed_path?(l)
   end
-
 
   def atom?(n) do
     TableauxRules.get_rule_type(n.sign, n.expression) == :atom
@@ -65,8 +69,9 @@ defmodule TableauxSimplified do
 
   def cleanup(l) do
     Enum.uniq_by(l, fn el -> "#{el.sign} #{el.string}" end)
-    |> Enum.sort_by(&TableauxRules.get_rule_type(&1.sign, &1.expression), &TableauxRules.compare_operators(&1, &2))
+    |> Enum.sort_by(
+      &TableauxRules.get_rule_type(&1.sign, &1.expression),
+      &TableauxRules.compare_operators(&1, &2)
+    )
   end
-
-
 end

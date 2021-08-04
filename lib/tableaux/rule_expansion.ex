@@ -17,8 +17,12 @@ defmodule RuleExpansion do
       }),
       do: expand_beta(tree, left, right, nid, false, [])
 
-  def apply_expansion(tree, %RuleExpansion{rule_type: :alpha, source_nid: nid, expanded_nodes: nodes}),
-    do: expand_alpha(tree, nodes, nid, false, [])
+  def apply_expansion(tree, %RuleExpansion{
+        rule_type: :alpha,
+        source_nid: nid,
+        expanded_nodes: nodes
+      }),
+      do: expand_alpha(tree, nodes, nid, false, [])
 
   @spec expand_alpha(nil | BinTree.t(), [TableauxNode.t()], nil | integer(), boolean(), [
           integer()
@@ -43,23 +47,23 @@ defmodule RuleExpansion do
   defp expand_alpha(nil, _, _, _, _), do: nil
 
   defp expand_alpha(
-        %BinTree{value: %TableauxNode{} = value, left: nil, right: nil} = tree,
-        [],
-        _ancestor,
-        _ancestor_found,
-        path
-      ) do
+         %BinTree{value: %TableauxNode{} = value, left: nil, right: nil} = tree,
+         [],
+         _ancestor,
+         _ancestor_found,
+         path
+       ) do
     is_closed_path = closes_path?(value, path)
     %BinTree{tree | value: %TableauxNode{value | closed: is_closed_path}}
   end
 
   defp expand_alpha(
-        %BinTree{value: %TableauxNode{nid: nid} = value, left: nil, right: nil} = tree,
-        list,
-        ancestor,
-        ancestor_found,
-        path
-      ) do
+         %BinTree{value: %TableauxNode{nid: nid} = value, left: nil, right: nil} = tree,
+         list,
+         ancestor,
+         ancestor_found,
+         path
+       ) do
     is_closed_path = closes_path?(value, path)
 
     if is_closed_path do
@@ -89,12 +93,12 @@ defmodule RuleExpansion do
   end
 
   defp expand_alpha(
-        %BinTree{value: %TableauxNode{nid: nid} = value, left: left, right: right} = tree,
-        list,
-        ancestor,
-        ancestor_found,
-        path
-      ) do
+         %BinTree{value: %TableauxNode{nid: nid} = value, left: left, right: right} = tree,
+         list,
+         ancestor,
+         ancestor_found,
+         path
+       ) do
     if closes_path?(value, path) do
       %BinTree{
         tree
@@ -131,13 +135,13 @@ defmodule RuleExpansion do
   defp expand_beta(nil, _, _, _, _, _), do: nil
 
   defp expand_beta(
-        %BinTree{value: %TableauxNode{nid: nid} = value, left: nil, right: nil} = tree,
-        %TableauxNode{sign: _lsign, string: _lstr} = lnode,
-        %TableauxNode{sign: _rsign, string: _rstr} = rnode,
-        ancestor,
-        ancestor_found,
-        path
-      ) do
+         %BinTree{value: %TableauxNode{nid: nid} = value, left: nil, right: nil} = tree,
+         %TableauxNode{sign: _lsign, string: _lstr} = lnode,
+         %TableauxNode{sign: _rsign, string: _rstr} = rnode,
+         ancestor,
+         ancestor_found,
+         path
+       ) do
     # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta_leaf")
     is_closed_path = closes_path?(value, path)
 
@@ -161,13 +165,13 @@ defmodule RuleExpansion do
   end
 
   defp expand_beta(
-        %BinTree{value: %TableauxNode{nid: nid} = value, left: left, right: right} = tree,
-        lexp,
-        rexp,
-        ancestor,
-        ancestor_found,
-        path
-      ) do
+         %BinTree{value: %TableauxNode{nid: nid} = value, left: left, right: right} = tree,
+         lexp,
+         rexp,
+         ancestor,
+         ancestor_found,
+         path
+       ) do
     # Enum.map(path, &"#{&1.sign} #{&1.string} [#{&1.source},#{&1.nid}]") |> IO.inspect(label: "beta")
     if closes_path?(value, path) do
       %BinTree{

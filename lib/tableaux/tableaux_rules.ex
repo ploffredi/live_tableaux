@@ -45,43 +45,43 @@ defmodule TableauxRules do
 
   @spec get_rule_expansion(TableauxNode.t(), integer()) :: RuleExpansion.t()
   def get_rule_expansion(
-         %TableauxNode{
-           sign: :F,
-           expression: atom,
-           nid: nid
-         },
-         _counter
-       )
-       when is_atom(atom),
-       do: %RuleExpansion{
-         rule_type: :alpha,
-         source_nid: nid,
-         expanded_nodes: []
-       }
+        %TableauxNode{
+          sign: :F,
+          expression: atom,
+          nid: nid
+        },
+        _counter
+      )
+      when is_atom(atom),
+      do: %RuleExpansion{
+        rule_type: :alpha,
+        source_nid: nid,
+        expanded_nodes: []
+      }
 
   def get_rule_expansion(
-         %TableauxNode{
-           sign: :T,
-           expression: atom,
-           nid: nid
-         },
-         _counter
-       )
-       when is_atom(atom),
-       do: %RuleExpansion{
-         rule_type: :alpha,
-         source_nid: nid,
-         expanded_nodes: []
-       }
+        %TableauxNode{
+          sign: :T,
+          expression: atom,
+          nid: nid
+        },
+        _counter
+      )
+      when is_atom(atom),
+      do: %RuleExpansion{
+        rule_type: :alpha,
+        source_nid: nid,
+        expanded_nodes: []
+      }
 
   def get_rule_expansion(
-         %TableauxNode{
-           sign: sign,
-           expression: {operator, expr1, expr2},
-           nid: nid
-         },
-         counter
-       ) do
+        %TableauxNode{
+          sign: sign,
+          expression: {operator, expr1, expr2},
+          nid: nid
+        },
+        counter
+      ) do
     {rule_type, nodes_signs} = Map.get(@expansion_rules, {sign, operator})
 
     %RuleExpansion{
@@ -102,13 +102,13 @@ defmodule TableauxRules do
   end
 
   def get_rule_expansion(
-         %TableauxNode{
-           sign: sign,
-           expression: {operator, expr1},
-           nid: nid
-         },
-         counter
-       ) do
+        %TableauxNode{
+          sign: sign,
+          expression: {operator, expr1},
+          nid: nid
+        },
+        counter
+      ) do
     {rule_type, nodes_signs} = Map.get(@expansion_rules, {sign, operator})
 
     %RuleExpansion{

@@ -18,29 +18,35 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "either a proposition or its negation is always verifiable", [:verbose, numtests: @numtests] do
+  property "either a proposition or its negation is always verifiable", [
+    :verbose,
+    numtests: @numtests
+  ] do
     forall p <- proposition() do
-      #IO.inspect(@assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))", label: "sequent")
-      #collect(
-        TableauxSimplified.is_valid?(
-          @assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))"
-        )
+      # IO.inspect(@assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))", label: "sequent")
+      # collect(
+      TableauxSimplified.is_valid?(
+        @assertion <> "(" <> p <> ")" <> @disjunction <> "(" <> @negation <> "(" <> p <> "))"
+      )
+
       #  ,
       # type_of_nexus(p)
-      #)
+      # )
     end
   end
 
-  property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify", [:verbose, numtests: @numtests] do
+  property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify",
+           [:verbose, numtests: @numtests] do
     forall p <- proposition() do
       TableauxSimplified.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
     end
   end
 
-
   property "a proposition always implies itself", [:verbose, numtests: @numtests] do
     forall p <- proposition() do
-      TableauxSimplified.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
+      TableauxSimplified.is_valid?(
+        @assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")"
+      )
     end
   end
 

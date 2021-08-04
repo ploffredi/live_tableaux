@@ -18,26 +18,30 @@ defmodule TableauxPbtTest do
     end
   end
 
-  property "either a proposition or its negation is always verifiable", [:verbose, numtests: @numtests] do
+  property "either a proposition or its negation is always verifiable", [
+    :verbose,
+    numtests: @numtests
+  ] do
     forall p <- proposition() do
-      #collect(
-        Tableaux.is_valid?(
-          @assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))"
-        )
+      # collect(
+      Tableaux.is_valid?(
+        @assertion <> "(" <> p <> ")" <> @disjunction <> "(" <> @negation <> "(" <> p <> "))"
+      )
+
       #  ,
       #  type_of_nexus(p)
-      #)
+      # )
     end
   end
 
-  property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify" , [:verbose, numtests: @numtests] do
+  property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify",
+           [:verbose, numtests: @numtests] do
     forall p <- proposition() do
       Tableaux.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
     end
   end
 
-
-  property "a proposition always implies itself" , [:verbose, numtests: @numtests] do
+  property "a proposition always implies itself", [:verbose, numtests: @numtests] do
     forall p <- proposition() do
       Tableaux.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
     end
