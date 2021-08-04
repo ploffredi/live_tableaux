@@ -8,10 +8,6 @@ defmodule TableauxSimplified do
     |> closes?()
   end
 
-  def closes?([]) do
-    true
-  end
-
   def closes?([h | t] = l) do
     cond do
       closed?(l) ->
