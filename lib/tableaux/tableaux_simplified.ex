@@ -5,6 +5,7 @@ defmodule TableauxSimplified do
 
   def is_valid?(sequent) do
     SequentParser.parse(sequent)
+    |> TableauxRules.sort_queue()
     |> closes?()
   end
 
@@ -65,9 +66,6 @@ defmodule TableauxSimplified do
 
   def cleanup(l) do
     Enum.uniq_by(l, fn el -> "#{el.sign} #{el.string}" end)
-    |> Enum.sort_by(
-      &TableauxRules.get_rule_type(&1.sign, &1.expression),
-      &TableauxRules.compare_operators(&1, &2)
-    )
+    |> TableauxRules.sort_queue()
   end
 end
