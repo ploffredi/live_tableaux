@@ -28,7 +28,7 @@ defmodule Tableaux do
   def expand(tree, [], _), do: tree
 
   def expand(nil, to_apply, [] = _applied) do
-    case RuleExpansion.closed_path(to_apply)  do
+    case RuleExpansion.closed_path?(to_apply)  do
        true -> RuleExpansion.linear_branch_from_list(to_apply)
        false -> RuleExpansion.linear_branch_from_list(to_apply) |> expand(to_apply, [])
     end
