@@ -8,16 +8,16 @@ defmodule RuleExpansion do
 
   defstruct [:rule_type, :source_nid, :expanded_nodes]
 
-  def expand(tree, %RuleExpansion{rule_type: _, expanded_nodes: []}), do: tree
+  def apply_expansion(tree, %RuleExpansion{rule_type: _, expanded_nodes: []}), do: tree
 
-  def expand(tree, %RuleExpansion{
+  def apply_expansion(tree, %RuleExpansion{
         rule_type: :beta,
         source_nid: nid,
         expanded_nodes: [left, right]
       }),
       do: expand_beta(tree, left, right, nid, false, [])
 
-  def expand(tree, %RuleExpansion{rule_type: :alpha, source_nid: nid, expanded_nodes: nodes}),
+  def apply_expansion(tree, %RuleExpansion{rule_type: :alpha, source_nid: nid, expanded_nodes: nodes}),
     do: expand_alpha(tree, nodes, nid, false, [])
 
   @spec expand_alpha(nil | BinTree.t(), [TableauxNode.t()], nil | integer(), boolean(), [
@@ -29,7 +29,7 @@ defmodule RuleExpansion do
   need to create the first tree after the sequent parsing
   """
 
-  def expand_alpha(nil, list, _, _, []) do
+  defp expand_alpha(nil, list, _, _, []) do
     count = Enum.count(list)
 
     list
@@ -40,9 +40,9 @@ defmodule RuleExpansion do
     |> RuleExpansion.linear_branch_from_list()
   end
 
-  def expand_alpha(nil, _, _, _, _), do: nil
+  defp expand_alpha(nil, _, _, _, _), do: nil
 
-  def expand_alpha(
+  defp expand_alpha(
         %BinTree{value: %TableauxNode{} = value, left: nil, right: nil} = tree,
         [],
         _ancestor,
@@ -53,7 +53,7 @@ defmodule RuleExpansion do
     %BinTree{tree | value: %TableauxNode{value | closed: is_closed_path}}
   end
 
-  def expand_alpha(
+  defp expand_alpha(
         %BinTree{value: %TableauxNode{nid: nid} = value, left: nil, right: nil} = tree,
         list,
         ancestor,
@@ -88,7 +88,7 @@ defmodule RuleExpansion do
     end
   end
 
-  def expand_alpha(
+  defp expand_alpha(
         %BinTree{value: %TableauxNode{nid: nid} = value, left: left, right: right} = tree,
         list,
         ancestor,
@@ -128,9 +128,9 @@ defmodule RuleExpansion do
   Apply a beta rules from tableaux to all the leaf nodes of a tree.
   """
 
-  def expand_beta(nil, _, _, _, _, _), do: nil
+  defp expand_beta(nil, _, _, _, _, _), do: nil
 
-  def expand_beta(
+  defp expand_beta(
         %BinTree{value: %TableauxNode{nid: nid} = value, left: nil, right: nil} = tree,
         %TableauxNode{sign: _lsign, string: _lstr} = lnode,
         %TableauxNode{sign: _rsign, string: _rstr} = rnode,
@@ -160,7 +160,7 @@ defmodule RuleExpansion do
     end
   end
 
-  def expand_beta(
+  defp expand_beta(
         %BinTree{value: %TableauxNode{nid: nid} = value, left: left, right: right} = tree,
         lexp,
         rexp,
