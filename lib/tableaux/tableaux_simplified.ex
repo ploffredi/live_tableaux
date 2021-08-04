@@ -1,6 +1,6 @@
 defmodule TableauxSimplified do
   @moduledoc """
-  Documentation for `Tableaux`.
+  Documentation for `Simplified Tableaux`.
   """
 
   def is_valid?(sequent) do
