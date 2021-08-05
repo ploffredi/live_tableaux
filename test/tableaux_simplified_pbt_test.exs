@@ -5,7 +5,7 @@ defmodule TableauxSimplifiedPbtTest do
   alias Tableaux, as: TReference
   alias TableauxSimplified, as: TImpl
 
-  @numtests 1000
+  @numtests 500
   @max_size 30
   @negation " ¬ "
   @conjunction " ∧ "
