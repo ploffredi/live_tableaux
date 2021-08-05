@@ -83,7 +83,8 @@ defmodule BinTree do
   end
 end
 
-# defimpl Inspect, for: BinTree do
+#
+####  defimpl Inspect, for: BinTree do
 #  import Inspect.Algebra
 
 # A custom inspect instance purely for the tests, this makes error messages

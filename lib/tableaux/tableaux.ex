@@ -24,19 +24,18 @@ defmodule Tableaux do
     expand(nil, nodes_list)
   end
 
-  @spec expand(BinTree.t(), [TableauxNode.t()], [TableauxNode.t()]) :: BinTree.t()
-  def expand(tree, to_apply, applied \\ [])
+  defp expand(tree, to_apply, applied \\ [])
 
-  def expand(tree, [], _), do: tree
+  defp expand(tree, [], _), do: tree
 
-  def expand(nil, to_apply, [] = _applied) do
+  defp expand(nil, to_apply, [] = _applied) do
     case RuleExpansion.closed_path?(to_apply) do
       true -> RuleExpansion.linear_branch_from_list(to_apply)
       false -> RuleExpansion.linear_branch_from_list(to_apply) |> expand(to_apply, [])
     end
   end
 
-  def expand(tree, to_apply, applied) do
+  defp expand(tree, to_apply, applied) do
     {:ok, expansion, expanded, remaining} = TableauxRules.get_expansion(to_apply, applied)
 
     RuleExpansion.apply_expansion(tree, expansion)

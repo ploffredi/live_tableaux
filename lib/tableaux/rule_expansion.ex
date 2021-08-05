@@ -24,14 +24,12 @@ defmodule RuleExpansion do
       }),
       do: expand_alpha(tree, nodes, nid, false, [])
 
-  @spec expand_alpha(nil | BinTree.t(), [TableauxNode.t()], nil | integer(), boolean(), [
-          integer()
+  @spec expand_alpha(nil | BinTree.t(), nil | [TableauxNode.t()], nil | integer(), boolean(), [
+          TableauxNode.t()
         ]) ::
-          BinTree.t()
-  @doc ~S"""
-  Apply an alpha rules from tableaux to all the leaf nodes of a tree. The function is useful when you
-  need to create the first tree after the sequent parsing
-  """
+          BinTree.t() | nil
+
+
 
   defp expand_alpha(nil, list, _, _, []) do
     count = Enum.count(list)
@@ -117,20 +115,7 @@ defmodule RuleExpansion do
     end
   end
 
-  @spec expand_beta(
-          BinTree.t(),
-          nil | TableauxNode.t(),
-          nil | TableauxNode.t(),
-          binary(),
-          boolean(),
-          [
-            BinTree.t()
-          ]
-        ) ::
-          BinTree.t()
-  @doc ~S"""
-  Apply a beta rules from tableaux to all the leaf nodes of a tree.
-  """
+
 
   defp expand_beta(nil, _, _, _, _, _), do: nil
 
@@ -184,9 +169,8 @@ defmodule RuleExpansion do
       %BinTree{
         tree
         | left:
-            expand_beta(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
-              value | path
-            ]),
+            expand_beta(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [value | path]
+            ),
           right:
             expand_beta(right, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
               value | path
