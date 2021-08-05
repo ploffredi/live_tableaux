@@ -81,16 +81,16 @@ defmodule TableauxPbtTest do
 
   ## Utility functions (for data collection and analysis)
 
-  defp type_of_nexus(p),
-    do:
-      type_of_nexus(
-        String.contains?(p, @conjunction),
-        String.contains?(p, @disjunction),
-        String.contains?(p, @implication)
-      )
-
-  defp type_of_nexus(true, _, _), do: " contains AND "
-  defp type_of_nexus(false, true, _), do: " contains OR "
-  defp type_of_nexus(false, false, true), do: " contains IMPLIES "
-  defp type_of_nexus(false, false, false), do: " contains none "
+ # defp type_of_nexus(p),
+ #   do:
+ #     type_of_nexus(
+ #       String.contains?(p, @conjunction),
+ #       String.contains?(p, @disjunction),
+ #       String.contains?(p, @implication)
+ #     )
+#
+ # defp type_of_nexus(true, _, _), do: " contains AND "
+ # defp type_of_nexus(false, true, _), do: " contains OR "
+ # defp type_of_nexus(false, false, true), do: " contains IMPLIES "
+ # defp type_of_nexus(false, false, false), do: " contains none "
 end

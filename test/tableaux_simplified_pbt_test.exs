@@ -2,8 +2,11 @@ defmodule TableauxSimplifiedPbtTest do
   use ExUnit.Case, async: true
   use PropCheck
 
+  alias Tableaux, as: TReference
+  alias TableauxSimplified, as: TImpl
+
   @numtests 1000
-  @max_size 20
+  @max_size 30
   @negation " ¬ "
   @conjunction " ∧ "
   @disjunction " ∨ "
@@ -13,7 +16,7 @@ defmodule TableauxSimplifiedPbtTest do
   property "a simple proposition is not verifiable" do
     forall p <- simple_proposition() do
       # collect(
-      not TableauxSimplified.is_valid?(@assertion <> p)
+      not TImpl.is_valid?(@assertion <> p)
       #  p
       # )
     end
@@ -26,7 +29,7 @@ defmodule TableauxSimplifiedPbtTest do
     forall p <- proposition() do
       # IO.inspect(@assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))", label: "sequent")
       # collect(
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <> "(" <> p <> ")" <> @disjunction <> "(" <> @negation <> "(" <> p <> "))"
       )
 
@@ -39,21 +42,21 @@ defmodule TableauxSimplifiedPbtTest do
   property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify",
            [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
-      TableauxSimplified.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
+      TImpl.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
     end
   end
 
   property "the results must be consistent with the the bintree based implementation",
            [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
-      TableauxSimplified.is_valid?(@assertion <> "(" <> p <> ")") ==
-        Tableaux.is_valid?(@assertion <> "(" <> p <> ")")
+      TImpl.is_valid?(@assertion <> "(" <> p <> ")") ==
+        TReference.is_valid?(@assertion <> "(" <> p <> ")")
     end
   end
 
   property "a proposition always implies itself", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")"
       )
     end
@@ -61,16 +64,16 @@ defmodule TableauxSimplifiedPbtTest do
 
   property "commutative laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> b <> ")"
       ) ==
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <> "(" <> b <> ")" <> @conjunction <> "(" <> a <> ")"
         ) &&
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> b <> ")"
         ) ==
-          TableauxSimplified.is_valid?(
+          TImpl.is_valid?(
             @assertion <> "(" <> b <> ")" <> @disjunction <> "(" <> a <> ")"
           )
     end
@@ -78,21 +81,21 @@ defmodule TableauxSimplifiedPbtTest do
 
   property "associative laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b, c] <- [proposition(), proposition(), proposition()] do
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <>
           "((" <> a <> ")" <> @disjunction <> "(" <> b <> "))" <> @disjunction <> "(" <> c <> ")"
       ) ==
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <>
             "(" <>
             a <> ")" <> @disjunction <> "((" <> b <> ")" <> @disjunction <> "(" <> c <> "))"
         ) &&
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <>
             "((" <>
             a <> ")" <> @conjunction <> "(" <> b <> "))" <> @conjunction <> "(" <> c <> ")"
         ) ==
-          TableauxSimplified.is_valid?(
+          TImpl.is_valid?(
             @assertion <>
               "(" <>
               a <> ")" <> @conjunction <> "((" <> b <> ")" <> @conjunction <> "(" <> c <> "))"
@@ -102,11 +105,11 @@ defmodule TableauxSimplifiedPbtTest do
 
   property "distributive laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b, c] <- [proposition(), proposition(), proposition()] do
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <>
           "(" <> a <> ")" <> @conjunction <> "((" <> b <> ")" <> @disjunction <> "(" <> c <> "))"
       ) ==
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <>
             "((" <>
             a <>
@@ -115,12 +118,12 @@ defmodule TableauxSimplifiedPbtTest do
             "(" <>
             b <> "))" <> @disjunction <> "((" <> a <> ")" <> @conjunction <> "(" <> c <> "))"
         ) &&
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <>
             "(" <>
             a <> ")" <> @disjunction <> "((" <> b <> ")" <> @conjunction <> "(" <> c <> "))"
         ) ==
-          TableauxSimplified.is_valid?(
+          TImpl.is_valid?(
             @assertion <>
               "((" <>
               a <>
@@ -134,47 +137,47 @@ defmodule TableauxSimplifiedPbtTest do
 
   property "absorption laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <>
           "(" <> a <> ")" <> @conjunction <> "((" <> a <> ")" <> @disjunction <> "(" <> b <> "))"
       ) ==
-        TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")") &&
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(@assertion <> "(" <> a <> ")") &&
+        TImpl.is_valid?(
           @assertion <>
             "(" <>
             a <> ")" <> @disjunction <> "((" <> a <> ")" <> @conjunction <> "(" <> b <> "))"
         ) ==
-          TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")")
+          TImpl.is_valid?(@assertion <> "(" <> a <> ")")
     end
   end
 
   property "idempotent laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall a <- proposition() do
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> a <> ")"
       ) ==
-        TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")") &&
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(@assertion <> "(" <> a <> ")") &&
+        TImpl.is_valid?(
           @assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> a <> ")"
         ) ==
-          TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")")
+          TImpl.is_valid?(@assertion <> "(" <> a <> ")")
     end
   end
 
   property "De Morgan's laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
-      TableauxSimplified.is_valid?(
+      TImpl.is_valid?(
         @assertion <> "(" <> @negation <> "((" <> a <> ")" <> @conjunction <> "(" <> b <> ")))"
       ) ==
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <>
             "(" <>
             @negation <> "(" <> a <> "))" <> @disjunction <> "(" <> @negation <> "(" <> b <> "))"
         ) &&
-        TableauxSimplified.is_valid?(
+        TImpl.is_valid?(
           @assertion <> "(" <> @negation <> "((" <> a <> ")" <> @disjunction <> "(" <> b <> ")))"
         ) ==
-          TableauxSimplified.is_valid?(
+          TImpl.is_valid?(
             @assertion <>
               "(" <>
               @negation <>
@@ -217,16 +220,16 @@ defmodule TableauxSimplifiedPbtTest do
 
   ## Utility functions (for data collection and analysis)
 
-  defp type_of_nexus(p),
-    do:
-      type_of_nexus(
-        String.contains?(p, @conjunction),
-        String.contains?(p, @disjunction),
-        String.contains?(p, @implication)
-      )
+ # defp type_of_nexus(p),
+ #   do:
+ #     type_of_nexus(
+ #       String.contains?(p, @conjunction),
+ #       String.contains?(p, @disjunction),
+ #       String.contains?(p, @implication)
+ #     )
 
-  defp type_of_nexus(true, _, _), do: " contains AND "
-  defp type_of_nexus(false, true, _), do: " contains OR "
-  defp type_of_nexus(false, false, true), do: " contains IMPLIES "
-  defp type_of_nexus(false, false, false), do: " contains none "
+ # defp type_of_nexus(true, _, _), do: " contains AND "
+ # defp type_of_nexus(false, true, _), do: " contains OR "
+ # defp type_of_nexus(false, false, true), do: " contains IMPLIES "
+ # defp type_of_nexus(false, false, false), do: " contains none "
 end

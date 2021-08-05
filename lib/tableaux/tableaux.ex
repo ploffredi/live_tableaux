@@ -1,4 +1,5 @@
 defmodule Tableaux do
+  use TableauxResolver
   @moduledoc """
   Documentation for `Tableaux`.
   """
@@ -10,6 +11,8 @@ defmodule Tableaux do
     |> is_closed()
   end
 
+  @impl true
+  @spec is_valid?(binary()) :: boolean()
   def is_valid?(sequent) do
     sequent
     |> expand_sequent()

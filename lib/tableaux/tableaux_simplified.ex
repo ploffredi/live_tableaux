@@ -1,8 +1,11 @@
 defmodule TableauxSimplified do
+ use TableauxResolver
   @moduledoc """
   Documentation for `Simplified Tableaux`.
   """
 
+  @impl true
+  @spec is_valid?(binary) :: boolean
   def is_valid?(sequent) do
     SequentParser.parse(sequent)
     |> sort()
