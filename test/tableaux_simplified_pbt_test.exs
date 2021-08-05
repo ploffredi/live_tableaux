@@ -2,7 +2,7 @@ defmodule TableauxSimplifiedPbtTest do
   use ExUnit.Case, async: true
   use PropCheck
 
-  @numtests 50
+  @numtests 100
   @negation " ¬ "
   @conjunction " ∧ "
   @disjunction " ∨ "
