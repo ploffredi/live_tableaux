@@ -29,8 +29,6 @@ defmodule RuleExpansion do
         ]) ::
           BinTree.t() | nil
 
-
-
   defp expand_alpha(nil, list, _, _, []) do
     count = Enum.count(list)
 
@@ -115,8 +113,6 @@ defmodule RuleExpansion do
     end
   end
 
-
-
   defp expand_beta(nil, _, _, _, _, _), do: nil
 
   defp expand_beta(
@@ -169,8 +165,9 @@ defmodule RuleExpansion do
       %BinTree{
         tree
         | left:
-            expand_beta(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [value | path]
-            ),
+            expand_beta(left, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
+              value | path
+            ]),
           right:
             expand_beta(right, lexp, rexp, ancestor, ancestor_found || nid == ancestor, [
               value | path

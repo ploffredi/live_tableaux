@@ -4,13 +4,13 @@ defmodule TableauxTest do
   doctest Tableaux
 
   test "Different tableaux same behaviour edge case 1" do
+    # 1..3|>Enum.map(fn l -> 1..2 |> Enum.map(fn el -> "p#{el}#{l}"end)end)
     assert Tableaux.is_valid?("|-( ¬ w) ∨ (w)") == TableauxSimplified.is_valid?("|-( ¬ w) ∨ (w)")
   end
 
   test "Different tableaux same behaviour edge case 2" do
     assert Tableaux.is_valid?("|-(i) ∨ ( ¬ q)") == TableauxSimplified.is_valid?("|-(i) ∨ ( ¬ q)")
   end
-
 
   test "complex tableaux formula" do
     assert TableauxSimplified.is_valid?(

@@ -1,5 +1,6 @@
 defmodule TableauxSimplified do
- use TableauxResolver
+  use TableauxResolver
+
   @moduledoc """
   Documentation for `Simplified Tableaux`.
   """
@@ -17,11 +18,12 @@ defmodule TableauxSimplified do
       closed?(l) ->
         true
 
- #     unexpandable?(l) ->
- #       false
+      #     unexpandable?(l) ->
+      #       false
 
       atom?(h) ->
-        false # (t ++ [h]) |> closes?()
+        # (t ++ [h]) |> closes?()
+        false
 
       alpha?(h) ->
         nodes = expand_alpha(h)
@@ -29,7 +31,7 @@ defmodule TableauxSimplified do
 
       beta?(h) ->
         {n1, n2} = expand_beta(h)
-        closes?(([n1|t]) |> cleanup() |> sort()) && closes?(([n2|t]) |> cleanup() |> sort())
+        closes?([n1 | t] |> cleanup() |> sort()) && closes?([n2 | t] |> cleanup() |> sort())
 
       true ->
         raise "unknown case"
@@ -46,9 +48,9 @@ defmodule TableauxSimplified do
     {n1, n2}
   end
 
- # def unexpandable?(l) do
- #   Enum.all?(l, fn n -> TableauxRules.get_rule_type(n.sign, n.expression) == :atom end)
- # end
+  # def unexpandable?(l) do
+  #   Enum.all?(l, fn n -> TableauxRules.get_rule_type(n.sign, n.expression) == :atom end)
+  # end
 
   def closed?(l) do
     RuleExpansion.closed_path?(l)

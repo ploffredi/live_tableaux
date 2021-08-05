@@ -1,6 +1,6 @@
 Definitions.
 
-ATOM       = [a-z]
+ATOM       = [a-zA-Z0-9_]* 
 TRUE_SIGN  = T\s
 FALSE_SIGN = F\s
 OPERATORS  = ([&|!>]|->|¬|∧|∨|→|\|-)

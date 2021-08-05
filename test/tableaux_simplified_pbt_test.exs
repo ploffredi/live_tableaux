@@ -5,7 +5,7 @@ defmodule TableauxSimplifiedPbtTest do
   alias Tableaux, as: TReference
   alias TableauxSimplified, as: TImpl
 
-  @numtests 500
+  @numtests 10
   @max_size 30
   @negation " ¬ "
   @conjunction " ∧ "
@@ -54,28 +54,22 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "a proposition always implies itself", [:verbose, numtests: @numtests, max_size: @max_size] do
+  property "a proposition always implies itself", [
+    :verbose,
+    numtests: @numtests,
+    max_size: @max_size
+  ] do
     forall p <- proposition() do
-      TImpl.is_valid?(
-        @assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")"
-      )
+      TImpl.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
     end
   end
 
   property "commutative laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
-      TImpl.is_valid?(
-        @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> b <> ")"
-      ) ==
-        TImpl.is_valid?(
-          @assertion <> "(" <> b <> ")" <> @conjunction <> "(" <> a <> ")"
-        ) &&
-        TImpl.is_valid?(
-          @assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> b <> ")"
-        ) ==
-          TImpl.is_valid?(
-            @assertion <> "(" <> b <> ")" <> @disjunction <> "(" <> a <> ")"
-          )
+      TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> b <> ")") ==
+        TImpl.is_valid?(@assertion <> "(" <> b <> ")" <> @conjunction <> "(" <> a <> ")") &&
+        TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> b <> ")") ==
+          TImpl.is_valid?(@assertion <> "(" <> b <> ")" <> @disjunction <> "(" <> a <> ")")
     end
   end
 
@@ -153,13 +147,9 @@ defmodule TableauxSimplifiedPbtTest do
 
   property "idempotent laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall a <- proposition() do
-      TImpl.is_valid?(
-        @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> a <> ")"
-      ) ==
+      TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> a <> ")") ==
         TImpl.is_valid?(@assertion <> "(" <> a <> ")") &&
-        TImpl.is_valid?(
-          @assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> a <> ")"
-        ) ==
+        TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> a <> ")") ==
           TImpl.is_valid?(@assertion <> "(" <> a <> ")")
     end
   end
@@ -220,16 +210,16 @@ defmodule TableauxSimplifiedPbtTest do
 
   ## Utility functions (for data collection and analysis)
 
- # defp type_of_nexus(p),
- #   do:
- #     type_of_nexus(
- #       String.contains?(p, @conjunction),
- #       String.contains?(p, @disjunction),
- #       String.contains?(p, @implication)
- #     )
+  # defp type_of_nexus(p),
+  #   do:
+  #     type_of_nexus(
+  #       String.contains?(p, @conjunction),
+  #       String.contains?(p, @disjunction),
+  #       String.contains?(p, @implication)
+  #     )
 
- # defp type_of_nexus(true, _, _), do: " contains AND "
- # defp type_of_nexus(false, true, _), do: " contains OR "
- # defp type_of_nexus(false, false, true), do: " contains IMPLIES "
- # defp type_of_nexus(false, false, false), do: " contains none "
+  # defp type_of_nexus(true, _, _), do: " contains AND "
+  # defp type_of_nexus(false, true, _), do: " contains OR "
+  # defp type_of_nexus(false, false, true), do: " contains IMPLIES "
+  # defp type_of_nexus(false, false, false), do: " contains none "
 end

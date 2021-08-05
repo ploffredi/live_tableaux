@@ -3,6 +3,7 @@ defmodule LiveTableauxWeb.TableauxLive do
 
   @samples [
     "p|q,q|-q",
+    "p|q,q|-!q",
     "|-(p∨(q∧r))→((p∨q)∧(p∨r))",
     "p∨q|-(p∨(q∧r))→((p∨q)∧(p∨r))"
   ]
