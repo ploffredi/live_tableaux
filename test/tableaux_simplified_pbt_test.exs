@@ -2,7 +2,7 @@ defmodule TableauxSimplifiedPbtTest do
   use ExUnit.Case, async: true
   use PropCheck
 
-  @numtests 1000
+  @numtests 50
   @negation " ¬ "
   @conjunction " ∧ "
   @disjunction " ∨ "
@@ -45,7 +45,8 @@ defmodule TableauxSimplifiedPbtTest do
   property "the results must be consistent with the the bintree based implementation",
            [:verbose, numtests: @numtests] do
     forall p <- proposition() do
-      TableauxSimplified.is_valid?( @assertion <> "(" <> p <> ")") == Tableaux.is_valid?( @assertion <> "(" <> p <> ")")
+      TableauxSimplified.is_valid?(@assertion <> "(" <> p <> ")") ==
+        Tableaux.is_valid?(@assertion <> "(" <> p <> ")")
     end
   end
 
@@ -54,6 +55,130 @@ defmodule TableauxSimplifiedPbtTest do
       TableauxSimplified.is_valid?(
         @assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")"
       )
+    end
+  end
+
+  property "commutative laws", [:verbose, numtests: @numtests] do
+    forall [a, b] <- [proposition(), proposition()] do
+      TableauxSimplified.is_valid?(
+        @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> b <> ")"
+      ) ==
+        TableauxSimplified.is_valid?(
+          @assertion <> "(" <> b <> ")" <> @conjunction <> "(" <> a <> ")"
+        ) &&
+        TableauxSimplified.is_valid?(
+          @assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> b <> ")"
+        ) ==
+          TableauxSimplified.is_valid?(
+            @assertion <> "(" <> b <> ")" <> @disjunction <> "(" <> a <> ")"
+          )
+    end
+  end
+
+  property "associative laws", [:verbose, numtests: @numtests] do
+    forall [a, b, c] <- [proposition(), proposition(), proposition()] do
+      TableauxSimplified.is_valid?(
+        @assertion <>
+          "((" <> a <> ")" <> @disjunction <> "(" <> b <> "))" <> @disjunction <> "(" <> c <> ")"
+      ) ==
+        TableauxSimplified.is_valid?(
+          @assertion <>
+            "(" <>
+            a <> ")" <> @disjunction <> "((" <> b <> ")" <> @disjunction <> "(" <> c <> "))"
+        ) &&
+        TableauxSimplified.is_valid?(
+          @assertion <>
+            "((" <>
+            a <> ")" <> @conjunction <> "(" <> b <> "))" <> @conjunction <> "(" <> c <> ")"
+        ) ==
+          TableauxSimplified.is_valid?(
+            @assertion <>
+              "(" <>
+              a <> ")" <> @conjunction <> "((" <> b <> ")" <> @conjunction <> "(" <> c <> "))"
+          )
+    end
+  end
+
+  property "distributive laws", [:verbose, numtests: @numtests] do
+    forall [a, b, c] <- [proposition(), proposition(), proposition()] do
+      TableauxSimplified.is_valid?(
+        @assertion <>
+          "(" <> a <> ")" <> @conjunction <> "((" <> b <> ")" <> @disjunction <> "(" <> c <> "))"
+      ) ==
+        TableauxSimplified.is_valid?(
+          @assertion <>
+            "((" <>
+            a <>
+            ")" <>
+            @conjunction <>
+            "(" <>
+            b <> "))" <> @disjunction <> "((" <> a <> ")" <> @conjunction <> "(" <> c <> "))"
+        ) &&
+        TableauxSimplified.is_valid?(
+          @assertion <>
+            "(" <>
+            a <> ")" <> @disjunction <> "((" <> b <> ")" <> @conjunction <> "(" <> c <> "))"
+        ) ==
+          TableauxSimplified.is_valid?(
+            @assertion <>
+              "((" <>
+              a <>
+              ")" <>
+              @disjunction <>
+              "(" <>
+              b <> "))" <> @conjunction <> "((" <> a <> ")" <> @disjunction <> "(" <> c <> "))"
+          )
+    end
+  end
+
+  property "absorption laws", [:verbose, numtests: @numtests] do
+    forall [a, b] <- [proposition(), proposition()] do
+      TableauxSimplified.is_valid?(
+        @assertion <>
+          "(" <> a <> ")" <> @conjunction <> "((" <> a <> ")" <> @disjunction <> "(" <> b <> "))"
+      ) ==
+        TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")") &&
+        TableauxSimplified.is_valid?(
+          @assertion <>
+            "(" <>
+            a <> ")" <> @disjunction <> "((" <> a <> ")" <> @conjunction <> "(" <> b <> "))"
+        ) ==
+          TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")")
+    end
+  end
+
+  property "idempotent laws", [:verbose, numtests: @numtests] do
+    forall a <- proposition() do
+      TableauxSimplified.is_valid?(
+        @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> a <> ")"
+      ) ==
+        TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")") &&
+        TableauxSimplified.is_valid?(
+          @assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> a <> ")"
+        ) ==
+          TableauxSimplified.is_valid?(@assertion <> "(" <> a <> ")")
+    end
+  end
+
+  property "De Morgan's laws", [:verbose, numtests: @numtests] do
+    forall [a, b] <- [proposition(), proposition()] do
+      TableauxSimplified.is_valid?(
+        @assertion <> "(" <> @negation <> "((" <> a <> ")" <> @conjunction <> "(" <> b <> ")))"
+      ) ==
+        TableauxSimplified.is_valid?(
+          @assertion <>
+            "(" <>
+            @negation <> "(" <> a <> "))" <> @disjunction <> "(" <> @negation <> "(" <> b <> "))"
+        ) &&
+        TableauxSimplified.is_valid?(
+          @assertion <> "(" <> @negation <> "((" <> a <> ")" <> @disjunction <> "(" <> b <> ")))"
+        ) ==
+          TableauxSimplified.is_valid?(
+            @assertion <>
+              "(" <>
+              @negation <>
+              "(" <> a <> "))" <> @conjunction <> "(" <> @negation <> "(" <> b <> "))"
+          )
     end
   end
 

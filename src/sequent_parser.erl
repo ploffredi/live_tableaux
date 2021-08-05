@@ -514,7 +514,7 @@ yeccpars2_17_(__Stack0) ->
 yeccpars2_18_(__Stack0) ->
  [___2,___1 | __Stack] = __Stack0,
  [begin
-                                  ___2
+                                  map_index(___2,1)
   end | __Stack].
 
 -compile({inline,yeccpars2_20_/1}).

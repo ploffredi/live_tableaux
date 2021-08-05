@@ -24,7 +24,7 @@ elems -> '(' elems ')' : '$2'.
 elems -> atom : extract_token('$1').  
 
 
-sequent -> assertion descendant : '$2'.
+sequent -> assertion descendant : map_index('$2',1).
 sequent -> ascendants assertion descendant : map_index('$1' ++ '$3',1).
 
 

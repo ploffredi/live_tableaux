@@ -2,7 +2,7 @@ defmodule TableauxPbtTest do
   use ExUnit.Case, async: true
   use PropCheck
 
-  @numtests 1000
+  @numtests 100
   @negation " ¬ "
   @conjunction " ∧ "
   @disjunction " ∨ "

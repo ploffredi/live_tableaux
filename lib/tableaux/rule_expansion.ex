@@ -70,7 +70,7 @@ defmodule RuleExpansion do
       %BinTree{tree | value: %TableauxNode{value | closed: true}, left: nil, right: nil}
     else
       if ancestor_found || nid == ancestor do
-        closed_branch = Enum.any?(list, fn n -> closes_path?(n, path) end)
+        closed_branch = Enum.any?(list, fn n -> closes_path?(n, [value | path]) end)
 
         branch =
           list
