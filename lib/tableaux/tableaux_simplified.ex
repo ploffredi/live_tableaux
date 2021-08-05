@@ -43,9 +43,9 @@ defmodule TableauxSimplified do
     {n1, n2}
   end
 
-  def unexpandable?(l) do
-    Enum.all?(l, fn n -> TableauxRules.get_rule_type(n.sign, n.expression) == :atom end)
-  end
+ # def unexpandable?(l) do
+ #   Enum.all?(l, fn n -> TableauxRules.get_rule_type(n.sign, n.expression) == :atom end)
+ # end
 
   def closed?(l) do
     RuleExpansion.closed_path?(l)
