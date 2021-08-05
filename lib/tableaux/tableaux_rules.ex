@@ -16,6 +16,7 @@ defmodule TableauxRules do
   def compare_operators(op, op), do: false
   def compare_operators(:alpha, _), do: true
   def compare_operators(:atom, _), do: false
+  def compare_operators(_, :atom), do: true
   def compare_operators(_, :beta), do: true
   def compare_operators(_, _), do: false
 

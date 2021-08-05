@@ -5,7 +5,7 @@ defmodule TableauxSimplified do
 
   def is_valid?(sequent) do
     SequentParser.parse(sequent)
-    |> TableauxRules.sort_queue()
+    |> sort()
     |> closes?()
   end
 
@@ -14,19 +14,19 @@ defmodule TableauxSimplified do
       closed?(l) ->
         true
 
-      unexpandable?(l) ->
-        false
+ #     unexpandable?(l) ->
+ #       false
 
       atom?(h) ->
-        (t ++ [h]) |> closes?()
+        false # (t ++ [h]) |> closes?()
 
       alpha?(h) ->
         nodes = expand_alpha(h)
-        (t ++ nodes) |> cleanup() |> closes?()
+        (t ++ nodes) |> cleanup() |> sort() |> closes?()
 
       beta?(h) ->
         {n1, n2} = expand_beta(h)
-        closes?((t ++ [n1]) |> cleanup()) && closes?((t ++ [n2]) |> cleanup())
+        closes?(([n1|t]) |> cleanup() |> sort()) && closes?(([n2|t]) |> cleanup() |> sort())
 
       true ->
         raise "unknown case"
@@ -35,7 +35,6 @@ defmodule TableauxSimplified do
 
   def expand_alpha(n) do
     %{expanded_nodes: expanded_nodes} = TableauxRules.get_rule_expansion(n, 0)
-
     expanded_nodes
   end
 
@@ -66,6 +65,9 @@ defmodule TableauxSimplified do
 
   def cleanup(l) do
     Enum.uniq_by(l, fn el -> "#{el.sign} #{el.string}" end)
-    |> TableauxRules.sort_queue()
+  end
+
+  def sort(l) do
+    TableauxRules.sort_queue(l)
   end
 end
