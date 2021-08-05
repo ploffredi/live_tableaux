@@ -2,7 +2,8 @@ defmodule TableauxSimplifiedPbtTest do
   use ExUnit.Case, async: true
   use PropCheck
 
-  @numtests 200
+  @numtests 1000
+  @max_size 20
   @negation " ¬ "
   @conjunction " ∧ "
   @disjunction " ∨ "
@@ -36,21 +37,21 @@ defmodule TableauxSimplifiedPbtTest do
   end
 
   property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify",
-           [:verbose, numtests: @numtests] do
+           [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
       TableauxSimplified.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
     end
   end
 
   property "the results must be consistent with the the bintree based implementation",
-           [:verbose, numtests: @numtests] do
+           [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
       TableauxSimplified.is_valid?(@assertion <> "(" <> p <> ")") ==
         Tableaux.is_valid?(@assertion <> "(" <> p <> ")")
     end
   end
 
-  property "a proposition always implies itself", [:verbose, numtests: @numtests] do
+  property "a proposition always implies itself", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
       TableauxSimplified.is_valid?(
         @assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")"
@@ -58,7 +59,7 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "commutative laws", [:verbose, numtests: @numtests] do
+  property "commutative laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
       TableauxSimplified.is_valid?(
         @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> b <> ")"
@@ -75,7 +76,7 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "associative laws", [:verbose, numtests: @numtests] do
+  property "associative laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b, c] <- [proposition(), proposition(), proposition()] do
       TableauxSimplified.is_valid?(
         @assertion <>
@@ -99,7 +100,7 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "distributive laws", [:verbose, numtests: @numtests] do
+  property "distributive laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b, c] <- [proposition(), proposition(), proposition()] do
       TableauxSimplified.is_valid?(
         @assertion <>
@@ -131,7 +132,7 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "absorption laws", [:verbose, numtests: @numtests] do
+  property "absorption laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
       TableauxSimplified.is_valid?(
         @assertion <>
@@ -147,7 +148,7 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "idempotent laws", [:verbose, numtests: @numtests] do
+  property "idempotent laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall a <- proposition() do
       TableauxSimplified.is_valid?(
         @assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> a <> ")"
@@ -160,7 +161,7 @@ defmodule TableauxSimplifiedPbtTest do
     end
   end
 
-  property "De Morgan's laws", [:verbose, numtests: @numtests] do
+  property "De Morgan's laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
       TableauxSimplified.is_valid?(
         @assertion <> "(" <> @negation <> "((" <> a <> ")" <> @conjunction <> "(" <> b <> ")))"
