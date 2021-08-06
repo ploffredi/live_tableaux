@@ -12,8 +12,7 @@ defmodule Tableaux do
     |> is_closed()
   end
 
-  @impl
-  @spec is_valid?(binary()) :: boolean()
+  @impl true
   def is_valid?(sequent) do
     sequent
     |> expand_sequent()
@@ -43,20 +42,20 @@ defmodule Tableaux do
     |> expand(remaining ++ expansion.expanded_nodes, [expanded | applied])
   end
 
-  @spec is_closed(nil | BinTree.t()) :: boolean()
-  def is_closed(nil) do
+  defp is_closed(nil) do
     true
   end
 
-  def is_closed(%BinTree{value: %TableauxNode{closed: closed}, left: nil, right: nil}) do
+  defp is_closed(%BinTree{value: %TableauxNode{closed: closed}, left: nil, right: nil})
+       when is_boolean(closed) do
     closed
   end
 
-  def is_closed(%BinTree{left: left, right: right}) do
-    is_closed(left) && is_closed(right)
+  defp is_closed(%BinTree{left: left, right: right}) do
+    is_closed(left) and is_closed(right)
   end
 
-  @spec from_sequent(binary) :: BinTree.t()
+  @spec from_sequent(binary()) :: BinTree.t()
   @doc ~S"""
   Parses the given `sequent` into a binary tree.
   """

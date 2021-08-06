@@ -176,13 +176,12 @@ defmodule RuleExpansion do
     end
   end
 
-  @spec linear_branch_from_list([TableauxNode.t()]) :: BinTree.t()
+  @spec linear_branch_from_list([TableauxNode.t()]) :: nil | BinTree.t()
   def linear_branch_from_list(list) do
     is_closed = closed_path?(list)
     linear_branch_from_list_rec(list, is_closed)
   end
 
-  @spec linear_branch_from_list_rec([TableauxNode.t()], boolean()) :: BinTree.t()
   defp linear_branch_from_list_rec([], _), do: nil
 
   defp linear_branch_from_list_rec(
