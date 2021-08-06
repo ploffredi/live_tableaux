@@ -49,9 +49,9 @@ defmodule LiveTableauxWeb.TableauxLive do
   end
 
   @impl true
-  def handle_event("toggle_gen_info", _, %{:assigns => %{:gen_info => gen_info}}=socket) do
+  def handle_event("toggle_gen_info", _, %{:assigns => %{:gen_info => gen_info}} = socket) do
     socket = assign(socket, gen_info: !gen_info)
-    {:noreply, push_event(socket, "toggleGenInfo", %{showGen: !gen_info}) }
+    {:noreply, push_event(socket, "toggleGenInfo", %{showGen: !gen_info})}
   end
 
   @impl true

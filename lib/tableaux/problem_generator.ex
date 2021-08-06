@@ -1,14 +1,18 @@
 defmodule ProblemGenerator do
   def generate(:php, n) do
-    "(" <>
-      (0..n
-       |> Enum.map(fn i -> 0..(n - 1) |> Enum.map(fn j -> "p#{i + 1}_#{j + 1}" end) end)
-       |> Enum.map(fn l -> round_bracket(l, "|") end)
-       |> Enum.join("&")) <>
-      ") |- " <>
-      ((n - 1)..0
-       |> Enum.flat_map(fn c -> fac_list(n - 1, c) end)
-       |> Enum.join("|"))
+    left =
+      0..n
+      |> Enum.map(fn i -> 0..(n - 1) |> Enum.map(fn j -> "p#{i + 1}_#{j + 1}" end) end)
+      |> Enum.map(fn l -> round_bracket(l, "|") end)
+      |> Enum.join("&")
+      |> (&"(#{&1})").()
+
+    right =
+      (n - 1)..0
+      |> Enum.flat_map(fn c -> fac_list(n - 1, c) end)
+      |> Enum.join("|")
+
+    left <> " |- " <> right
   end
 
   def fac_list(n, c) do
