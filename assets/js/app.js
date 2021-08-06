@@ -89,6 +89,30 @@ Hooks.D3Tree = {
                   .text(function(d) { return d.data.name; });
 
     } );
+
+    this.handleEvent("toggleGenInfo", (genInfoVisible) =>{
+
+        
+                  // declares a tree layout and assigns the size
+                  var treemap = d3.tree();
+
+                  d3.selectAll(".node>text").text(
+                    function(t){
+                      if (genInfoVisible.showGen)
+                      {
+                          return t.data.name;
+                      }
+                      else
+                      {
+                        const idx = t.data.name.indexOf("[");
+                        const cleaned= t.data.name.substr(0, idx-1).trim();
+                        return cleaned;
+                      }
+                      
+
+                      });
+
+    } );
   }
 }
 

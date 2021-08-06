@@ -9,7 +9,7 @@ defmodule LiveTableauxWeb.TableauxLive do
   ]
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, sequent: "", samples: @samples)}
+    {:ok, assign(socket, sequent: "", samples: @samples, gen_info: true)}
   end
 
   @impl true
@@ -46,6 +46,12 @@ defmodule LiveTableauxWeb.TableauxLive do
   @impl true
   def handle_event("sample_selected", %{"sample" => ""}, socket) do
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("toggle_gen_info", _, %{:assigns => %{:gen_info => gen_info}}=socket) do
+    socket = assign(socket, gen_info: !gen_info)
+    {:noreply, push_event(socket, "toggleGenInfo", %{showGen: !gen_info}) }
   end
 
   @impl true
