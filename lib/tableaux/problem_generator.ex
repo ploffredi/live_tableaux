@@ -3,8 +3,7 @@ defmodule ProblemGenerator do
     left =
       0..n
       |> Enum.map(fn i -> 0..(n - 1) |> Enum.map(fn j -> "p#{i + 1}_#{j + 1}" end) end)
-      |> Enum.map(fn l -> round_bracket(l, "|") end)
-      |> Enum.join("&")
+      |> Enum.map_join("&", fn l -> round_bracket(l, "|") end)
       |> (&"(#{&1})").()
 
     right =

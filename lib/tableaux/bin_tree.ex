@@ -22,7 +22,7 @@ defmodule BinTree do
   defp get_full_name(%BinTree{
          value: %TableauxNode{string: string, sign: sign, nid: nid, source: source}
        }) do
-    source = if !is_nil(source), do: "#{source}:", else: ""
+    source = if is_nil(source), do: "", else: "#{source}:"
     "#{sign} #{string}    [#{source}#{nid}]"
   end
 
