@@ -13,6 +13,13 @@ defmodule ProblemGenerator do
     left <> " |- " <> right
   end
 
+  def right_list(n) do
+    for(i <- 0..n, j <- 0..(n - 1), k <- 0..n, do: {i, j, k})
+    |> Enum.filter(fn {i, _j, k} -> i < k end)
+    |> Enum.sort_by(fn {_i, j, _k} -> j end)
+    |> Enum.map(fn {i, j, k} -> "(p#{i + 1}_#{j + 1}&p#{k + 1}_#{j + 1})" end)
+  end
+
   def round_bracket(l, op) do
     Enum.reverse(l)
     |> round_bracket_rec(op)
@@ -24,12 +31,5 @@ defmodule ProblemGenerator do
 
   def round_bracket_rec([p | t], op) do
     "(" <> round_bracket_rec(t, op) <> op <> p <> ")"
-  end
-
-  def right_list(n) do
-    for(i <- 0..n, j <- 0..(n - 1), k <- 0..n, do: {i, j, k})
-    |> Enum.filter(fn {i, _j, k} -> i < k end)
-    |> Enum.sort_by(fn {_i, j, _k} -> j end)
-    |> Enum.map(fn {i, j, k} -> "(p#{i + 1}_#{j + 1}&p#{k + 1}_#{j + 1})" end)
   end
 end
