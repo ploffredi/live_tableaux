@@ -215,7 +215,7 @@ defmodule RuleExpansion do
   defp invert_sign(:T), do: :F
   defp invert_sign(:F), do: :T
 
-  defp closes_path?(%TableauxNode{sign: sign, string: string}, lst) do
+  def closes_path?(%TableauxNode{sign: sign, string: string}, lst) do
     Enum.any?(lst, fn e -> e.sign == invert_sign(sign) && e.string == string end)
   end
 

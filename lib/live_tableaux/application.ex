@@ -14,7 +14,8 @@ defmodule LiveTableaux.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: LiveTableaux.PubSub},
       # Start the Endpoint (http/https)
-      LiveTableauxWeb.Endpoint
+      LiveTableauxWeb.Endpoint,
+      {Task.Supervisor, name: LiveTableaux.TaskSupervisor}
       # Start a worker by calling: LiveTableaux.Worker.start_link(arg)
       # {LiveTableaux.Worker, arg}
     ]
