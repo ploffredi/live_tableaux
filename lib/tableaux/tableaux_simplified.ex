@@ -8,34 +8,51 @@ defmodule TableauxSimplified do
   @impl true
   @spec is_valid?(binary) :: boolean
   def is_valid?(sequent) do
-    SequentParser.parse(sequent)
-    |> sort()
-    |> closes?()
+    parse =
+      SequentParser.parse(sequent)
+      |> sort()
+
+    closes?([parse], true)
   end
 
-  def closes?([h | t] = l) do
-    cond do
-      closed?(l) ->
-        true
+  def closes?([], result) do
+    result
+  end
 
-      #     unexpandable?(l) ->
-      #       false
+  def closes?(_, false) do
+    false
+  end
 
-      atom?(h) ->
-        # (t ++ [h]) |> closes?()
-        false
+  def closes?([qh | qt], _) do
+    [h | t] = qh
 
-      alpha?(h) ->
-        nodes = expand_alpha(h)
-        (t ++ nodes) |> cleanup() |> sort() |> closes?()
+    {r, to_enqueue} =
+      cond do
+        closed?([h | t]) ->
+          {true, []}
 
-      beta?(h) ->
-        {n1, n2} = expand_beta(h)
-        closes?([n1 | t] |> cleanup() |> sort()) && closes?([n2 | t] |> cleanup() |> sort())
+        atom?(h) ->
+          # (t ++ [h]) |> closes?()
+          {false, []}
 
-      true ->
-        raise "unknown case"
-    end
+        alpha?(h) ->
+          nodes = expand_alpha(h)
+
+          {true, [(nodes ++ t) |> cleanup()]}
+
+        beta?(h) ->
+          {n1, n2} = expand_beta(h)
+
+          l1 = t ++ n1
+          l2 = t ++ n2
+
+          {true, [cleanup(l1), cleanup(l2)]}
+
+        true ->
+          {nil, nil}
+      end
+
+    closes?(to_enqueue ++ qt, r)
   end
 
   def expand_alpha(n) do
@@ -69,6 +86,7 @@ defmodule TableauxSimplified do
   end
 
   def cleanup(l) do
+    IO.inspect(l, label: "test")
     Enum.uniq_by(l, fn el -> "#{el.sign} #{el.string}" end)
   end
 
