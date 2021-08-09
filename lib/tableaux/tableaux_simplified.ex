@@ -38,15 +38,18 @@ defmodule TableauxSimplified do
         alpha?(h) ->
           nodes = expand_alpha(h)
 
-          {true, [(nodes ++ t) |> cleanup()]}
+          case nodes do
+            [] ->
+              {true, [(nodes ++ [h]) |> cleanup() |> sort()]}
+
+            nodes ->
+              {true, [(nodes ++ t) |> cleanup() |> sort()]}
+          end
 
         beta?(h) ->
           {n1, n2} = expand_beta(h)
 
-          l1 = t ++ n1
-          l2 = t ++ n2
-
-          {true, [cleanup(l1), cleanup(l2)]}
+          {true, [(t ++ [n1]) |> cleanup() |> sort(), (t ++ [n2]) |> cleanup() |> sort()]}
 
         true ->
           {nil, nil}
@@ -86,7 +89,6 @@ defmodule TableauxSimplified do
   end
 
   def cleanup(l) do
-    IO.inspect(l, label: "test")
     Enum.uniq_by(l, fn el -> "#{el.sign} #{el.string}" end)
   end
 
