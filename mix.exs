@@ -47,7 +47,8 @@ defmodule LiveTableaux.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:propcheck, "~> 1.4", only: [:dev, :test]}
+      {:propcheck, "~> 1.4", only: [:dev, :test]},
+      {:benchee, "~> 1.0"}
     ]
   end
 

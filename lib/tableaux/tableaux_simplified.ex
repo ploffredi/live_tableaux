@@ -52,7 +52,7 @@ defmodule TableauxSimplified do
           {nil, []}
       end
 
-    closes_tr?(list ++ qt, r)
+    closes_tr?(Enum.concat(list, qt), r)
   end
 
   def closes?([]) do
