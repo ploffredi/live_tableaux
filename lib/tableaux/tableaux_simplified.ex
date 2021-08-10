@@ -22,6 +22,10 @@ defmodule TableauxSimplified do
     result
   end
 
+  def closes_tr?(_, false) do
+    false
+  end
+
   def closes_tr?([[] | qt], result) do
     closes_tr?(qt, result)
   end
