@@ -27,7 +27,6 @@ defmodule TableauxSimplified do
     #  "#{n.sign} #{n.string}"
     # end)
     # |> Enum.join(" - ")
-    # [h | t]
     # |> IO.inspect()
 
     cond do
@@ -44,13 +43,7 @@ defmodule TableauxSimplified do
       alpha?(h) ->
         nodes = expand_alpha(h)
 
-        case nodes do
-          [] ->
-            expand_and_cleanup(t, h) |> closes?()
-
-          nodes ->
-            expand_and_cleanup(t, nodes) |> closes?()
-        end
+        expand_and_cleanup(t, nodes) |> closes?()
 
       beta?(h) ->
         {n1, n2} = expand_beta(h)
