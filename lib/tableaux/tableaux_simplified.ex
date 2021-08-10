@@ -8,15 +8,31 @@ defmodule TableauxSimplified do
   @impl true
   @spec is_valid?(binary) :: boolean
   def is_valid?(sequent) do
-    SequentParser.parse(sequent)
-    |> sort()
-    |> closes?()
+    parse =
+      SequentParser.parse(sequent)
+      |> sort()
+
+    case closed?(parse) do
+      true -> true
+      false -> closes?(parse)
+    end
   end
 
-  def closes?([h | t] = l) do
+  def closes?([]) do
+    true
+  end
+
+  def closes?([h | t]) do
+    # Enum.map([h | t], fn n ->
+    #  "#{n.sign} #{n.string}"
+    # end)
+    # |> Enum.join(" - ")
+    # [h | t]
+    # |> IO.inspect()
+
     cond do
-      closed?(l) ->
-        true
+      # closed?(l) ->
+      # true
 
       #     unexpandable?(l) ->
       #       false
@@ -27,11 +43,20 @@ defmodule TableauxSimplified do
 
       alpha?(h) ->
         nodes = expand_alpha(h)
-        (t ++ nodes) |> cleanup() |> sort() |> closes?()
+
+        case nodes do
+          [] ->
+            expand_and_cleanup(t, h) |> closes?()
+
+          nodes ->
+            expand_and_cleanup(t, nodes) |> closes?()
+        end
 
       beta?(h) ->
         {n1, n2} = expand_beta(h)
-        closes?([n1 | t] |> cleanup() |> sort()) && closes?([n2 | t] |> cleanup() |> sort())
+
+        closes?(expand_and_cleanup(t, [n1])) &&
+          closes?(expand_and_cleanup(t, [n2]))
 
       true ->
         raise "unknown case"
@@ -66,6 +91,21 @@ defmodule TableauxSimplified do
 
   def beta?(n) do
     TableauxRules.get_rule_type(n.sign, n.expression) == :beta
+  end
+
+  def expand_and_cleanup(l, to_append) do
+    if closed?(to_append) do
+      []
+    else
+      if Enum.any?(to_append, fn n -> RuleExpansion.closes_path?(n, l) end) do
+        []
+      else
+        l
+        |> Enum.concat(to_append)
+        |> sort()
+        |> Enum.uniq_by(fn el -> "#{el.sign} #{el.string}" end)
+      end
+    end
   end
 
   def cleanup(l) do
