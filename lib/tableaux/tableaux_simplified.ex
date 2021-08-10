@@ -14,8 +14,41 @@ defmodule TableauxSimplified do
 
     case closed?(parse) do
       true -> true
-      false -> closes?(parse)
+      false -> closes_tr?([parse], true)
     end
+  end
+
+  def closes_tr?([], result) do
+    result
+  end
+
+  def closes_tr?([[] | qt], result) do
+    closes_tr?(qt, result)
+  end
+
+  def closes_tr?([qh | qt], result) do
+    [h | t] = qh
+
+    {r, list} =
+      cond do
+        atom?(h) ->
+          {false, []}
+
+        alpha?(h) ->
+          nodes = expand_alpha(h)
+
+          {result, [expand_and_cleanup(t, nodes)]}
+
+        beta?(h) ->
+          {n1, n2} = expand_beta(h)
+
+          {result, [expand_and_cleanup(t, [n1]), expand_and_cleanup(t, [n2])]}
+
+        true ->
+          {nil, []}
+      end
+
+    closes_tr?(list ++ qt, r)
   end
 
   def closes?([]) do
