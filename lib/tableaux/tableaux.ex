@@ -1,74 +1,77 @@
 defmodule Tableaux do
-  use TableauxResolver
-
   @moduledoc """
-  Documentation for `Tableaux`.
+  Implementation of the Analytic Tableaux method.
   """
+  @doc """
+  Hello world.
 
-  @spec verify(binary()) :: boolean()
-  def verify(sequent) do
-    sequent
-    |> expand_sequent()
-    |> is_closed()
+  ## Examples
+
+      iex> Tableaux.prove("p->q, p |- q")
+      true
+
+      iex> Tableaux.prove("p->q, p |- t")
+      false
+  """
+  @spec prove(String.t()) :: boolean()
+  def prove(argument) do
+    [head | tail] = Parser.parse(argument)
+
+    is_valid?(BinTree.from_node(head), [], tail)
   end
 
-  def is_valid?(sequent) do
-    sequent
-    |> expand_sequent()
-    |> is_closed()
-  end
+  @spec is_valid?(BinTree.t(), [TreeNode.t()], [TreeNode.t()]) :: boolean()
+  def is_valid?(tree, path, to_expand)
 
-  @impl true
-  def prove(_sequent) do
-    nil
-  end
+  def is_valid?(nil, _, _), do: true
 
-  def expand_sequent(sequent) do
-    nodes_list = SequentParser.parse(sequent)
-    expand(nil, nodes_list)
-  end
+  def is_valid?(%{left: nil, right: nil, value: value} = tree, path, to_expand) do
+    # IO.inspect(tree)
+    # IO.inspect(to_expand)
+    # IO.puts("\n")
 
-  defp expand(tree, to_apply, applied \\ [])
+    cond do
+      closed?(value, path) ->
+        true
 
-  defp expand(tree, [], _), do: tree
+      Rules.can_expand?(value) ->
+        # Expand the current node, add the expansions to the tree and the stack,
+        # then call is_valid? on the new tree created from the expansions
+        %{tree: expanded_tree, expansion: expanded} = Rules.apply_rule(value)
 
-  defp expand(nil, to_apply, [] = _applied) do
-    case RuleExpansion.closed_path?(to_apply) do
-      true -> RuleExpansion.linear_branch_from_list(to_apply)
-      false -> RuleExpansion.linear_branch_from_list(to_apply) |> expand(to_apply, [])
+        new_to_expand = Enum.filter(expanded, &Rules.can_expand?/1)
+
+        is_valid?(BinTree.add(tree, expanded_tree), path, new_to_expand ++ to_expand)
+
+      Enum.empty?(to_expand) ->
+        false
+
+      true ->
+        # Expand the first element from the stack, add the expansions to the tree and the stack,
+        # then call is_valid? on the new tree created from the expansions
+        [head | tail] = to_expand
+
+        %{tree: expanded_tree, expansion: expanded} = Rules.apply_rule(head)
+
+        new_to_expand = Enum.filter(expanded, &Rules.can_expand?/1) ++ tail
+
+        is_valid?(BinTree.add(tree, expanded_tree), path, new_to_expand)
     end
   end
 
-  defp expand(tree, to_apply, applied) do
-    {:ok, expansion, expanded, remaining} = TableauxRules.get_expansion(to_apply, applied)
-
-    RuleExpansion.apply_expansion(tree, expansion)
-    |> expand(remaining ++ expansion.expanded_nodes, [expanded | applied])
+  def is_valid?(%{left: left, right: right, value: value}, path, to_expand) do
+    if closed?(value, path) do
+      true
+    else
+      is_valid?(left, [value | path], to_expand) and is_valid?(right, [value | path], to_expand)
+    end
   end
 
-  defp is_closed(nil) do
-    true
-  end
+  @spec closed?(TreeNode.formula(), [TreeNode.formula()]) :: boolean()
+  def closed?(formula, path), do: Enum.any?(path, &contradiction?(formula, &1))
 
-  defp is_closed(%BinTree{value: %TableauxNode{closed: closed}, left: nil, right: nil})
-       when is_boolean(closed) do
-    closed
-  end
-
-  defp is_closed(%BinTree{left: left, right: right}) do
-    is_closed(left) and is_closed(right)
-  end
-
-  @spec from_sequent(binary()) :: BinTree.t()
-  @doc ~S"""
-  Parses the given `sequent` into a binary tree.
-  """
-  def from_sequent(sequent) do
-    sequent |> parse_sequent() |> RuleExpansion.linear_branch_from_list()
-  end
-
-  @spec parse_sequent(binary) :: [TableauxNode.t()]
-  def parse_sequent(sequent) do
-    sequent |> SequentParser.parse()
-  end
+  @spec contradiction?(TreeNode.t(), TreeNode.t()) :: boolean()
+  def contradiction?(%{sign: :F, formula: formula}, %{sign: :T, formula: formula}), do: true
+  def contradiction?(%{sign: :T, formula: formula}, %{sign: :F, formula: formula}), do: true
+  def contradiction?(_, _), do: false
 end

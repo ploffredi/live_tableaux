@@ -1,107 +1,37 @@
 defmodule BinTree do
-  @moduledoc """
-  A node in a binary tree.
-
-  `value` is the value of a node.
-  `left` is the left subtree (nil if no subtree).
-  `right` is the right subtree (nil if no subtree).
-  """
-
-  @node_color "rgb(0,240,0)"
-  @leaf_color "rgb(240,0,0)"
-  @closed_color "rgb(0,0,0)"
-
   @type t :: %BinTree{
-          value: TableauxNode.t(),
-          left: t() | nil,
-          right: t() | nil
+          value: TreeNode.t(),
+          left: BinTree.t() | nil,
+          right: BinTree.t() | nil
         }
 
-  defstruct [:value, :left, :right]
+  defstruct [:value, left: nil, right: nil]
 
-  defp get_full_name(%BinTree{
-         value: %TableauxNode{string: string, sign: sign, nid: nid, source: source}
-       }) do
-    source = if is_nil(source), do: "", else: "#{source}:"
-    "#{sign} #{string}    [#{source}#{nid}]"
+  @spec linear_from_list([TreeNode.t()]) :: BinTree.t()
+  def linear_from_list([]), do: nil
+
+  def linear_from_list([head | tail]) do
+    %BinTree{value: head, left: linear_from_list(tail)}
   end
 
-  def to_map(
-        %BinTree{
-          left: nil,
-          right: nil,
-          value: %TableauxNode{closed: closed}
-        } = tree
-      ) do
-    if closed do
-      %{name: get_full_name(tree), color: @closed_color, children: []}
-    else
-      %{name: get_full_name(tree), color: @leaf_color, children: []}
-    end
+  @spec branch_from_list([TreeNode.t()]) :: BinTree.t()
+  def branch_from_list([]), do: nil
+
+  def branch_from_list([left, right]) do
+    %BinTree{value: nil, left: from_node(left), right: from_node(right)}
   end
 
-  def to_map(
-        %BinTree{
-          left: left,
-          right: nil,
-          value: %TableauxNode{closed: closed}
-        } = tree
-      ) do
-    if closed do
-      %{name: get_full_name(tree), color: @closed_color, children: [to_map(left)]}
-    else
-      %{name: get_full_name(tree), color: @node_color, children: [to_map(left)]}
-    end
+  @spec from_node(TreeNode.t()) :: BinTree.t()
+  def from_node(node) do
+    %BinTree{value: node}
   end
 
-  def to_map(
-        %BinTree{
-          left: nil,
-          right: right,
-          value: %TableauxNode{closed: closed}
-        } = tree
-      ) do
-    if closed do
-      %{name: get_full_name(tree), color: @closed_color, children: [to_map(right)]}
-    else
-      %{name: get_full_name(tree), color: @node_color, children: [to_map(right)]}
-    end
+  @spec add(BinTree.t(), BinTree.t()) :: BinTree.t()
+  def add(%{left: nil, right: nil} = tree, %{value: nil, left: left, right: right}) do
+    %BinTree{tree | left: left, right: right}
   end
 
-  def to_map(
-        %BinTree{
-          left: left,
-          right: right,
-          value: %TableauxNode{closed: closed}
-        } = tree
-      ) do
-    if closed do
-      %{name: get_full_name(tree), color: @closed_color, children: [to_map(left), to_map(right)]}
-    else
-      %{name: get_full_name(tree), color: @node_color, children: [to_map(left), to_map(right)]}
-    end
-  end
-end
-
-defimpl Inspect, for: BinTree do
-  import Inspect.Algebra
-
-  # A custom inspect instance purely for the tests, this makes error messages
-  # much more readable.
-  #
-  # BinTree[value: 3, left: BinTree[value: 5, right: BinTree[value: 6]]] becomes (3:(5::(6::)):)
-  def inspect(
-        %BinTree{value: %TableauxNode{string: value, sign: sign}, left: left, right: right},
-        opts
-      ) do
-    concat([
-      "(",
-      to_doc("#{sign} #{value}", opts),
-      ":",
-      if(left, do: to_doc(left, opts), else: ""),
-      ":",
-      if(right, do: to_doc(right, opts), else: ""),
-      ")"
-    ])
+  def add(%{left: nil, right: nil} = tree, branch) do
+    %BinTree{tree | left: branch}
   end
 end
