@@ -1,5 +1,8 @@
 defmodule TableauxSimplified do
-  use TableauxResolver, TableauxSimplified
+  use TableauxResolver
+
+  import TableauxRules, only: [get_rule_type: 2, get_rule_expansion: 2, sort_queue: 1]
+  import RuleExpansion, only: [closes_path?: 2, closed_path?: 1]
 
   @moduledoc """
   Documentation for `Simplified Tableaux`.
@@ -100,37 +103,37 @@ defmodule TableauxSimplified do
   end
 
   def expand_alpha(n) do
-    %{expanded_nodes: expanded_nodes} = TableauxRules.get_rule_expansion(n, 0)
+    %{expanded_nodes: expanded_nodes} = get_rule_expansion(n, 0)
     expanded_nodes
   end
 
   def expand_beta(n) do
-    %{expanded_nodes: [n1, n2]} = TableauxRules.get_rule_expansion(n, 0)
+    %{expanded_nodes: [n1, n2]} = get_rule_expansion(n, 0)
     # IO.inspect("#{n1.sign} #{n1.string} /\\ #{n2.sign} #{n2.string}")
     {n1, n2}
   end
 
   def closed?(l) do
-    RuleExpansion.closed_path?(l)
+    closed_path?(l)
   end
 
   def simple_proposition?(n) do
-    TableauxRules.get_rule_type(n.sign, n.expression) == :atom
+    get_rule_type(n.sign, n.expression) == :atom
   end
 
   def alpha?(n) do
-    TableauxRules.get_rule_type(n.sign, n.expression) == :alpha
+    get_rule_type(n.sign, n.expression) == :alpha
   end
 
   def beta?(n) do
-    TableauxRules.get_rule_type(n.sign, n.expression) == :beta
+    get_rule_type(n.sign, n.expression) == :beta
   end
 
   def expand_and_cleanup(l, to_append) do
     if closed?(to_append) do
       []
     else
-      if Enum.any?(to_append, fn n -> RuleExpansion.closes_path?(n, l) end) do
+      if Enum.any?(to_append, fn n -> closes_path?(n, l) end) do
         []
       else
         l
@@ -142,7 +145,7 @@ defmodule TableauxSimplified do
   end
 
   def sort(l) do
-    TableauxRules.sort_queue(l)
+    sort_queue(l)
   end
 
   def to_counterproof(l) do
