@@ -1,20 +1,36 @@
 defmodule TableauxSimplified do
-  use TableauxResolver
+  use TableauxResolver, TableauxSimplified
 
   @moduledoc """
   Documentation for `Simplified Tableaux`.
   """
 
-  @impl true
-  @spec is_valid?(binary) :: boolean
   def is_valid?(sequent) do
     parse =
       SequentParser.parse(sequent)
       |> sort()
 
     case closed?(parse) do
-      true -> true
-      false -> closes_tr?([parse], true)
+      true -> %{status: :closed, counterproof: nil}
+      false -> closes_tr?([parse], %{status: :closed, counterproof: to_counterproof(parse)})
+    end
+  end
+
+  @impl true
+  def prove(sequent) do
+    parse =
+      SequentParser.parse(sequent)
+      |> sort()
+
+    case closed?(parse) do
+      true ->
+        %TableauxResolver{status: :closed, counterproof: nil}
+
+      false ->
+        closes_tr?([parse], %TableauxResolver{
+          status: :closed,
+          counterproof: to_counterproof(parse)
+        })
     end
   end
 
@@ -22,8 +38,8 @@ defmodule TableauxSimplified do
     result
   end
 
-  def closes_tr?(_, false) do
-    false
+  def closes_tr?(_, %{status: :open, counterproof: _} = result) do
+    result
   end
 
   def closes_tr?([[] | qt], result) do
@@ -36,7 +52,7 @@ defmodule TableauxSimplified do
     {r, list} =
       cond do
         atom?(h) ->
-          {false, []}
+          {%TableauxResolver{status: :open, counterproof: to_counterproof(qh)}, []}
 
         alpha?(h) ->
           nodes = expand_alpha(h)
@@ -49,48 +65,14 @@ defmodule TableauxSimplified do
           {result, [expand_and_cleanup(t, [n1]), expand_and_cleanup(t, [n2])]}
 
         true ->
-          {nil, []}
+          %{status: :unknown, counterproof: nil}
       end
 
+    # list
+    # |> Enum.map(fn lst -> Enum.map(lst, &"#{&1.sign} #{&1.string}") end)
+    # |> IO.inspect(label: "applied")
+
     closes_tr?(Enum.concat(list, qt), r)
-  end
-
-  def closes?([]) do
-    true
-  end
-
-  def closes?([h | t]) do
-    # Enum.map([h | t], fn n ->
-    #  "#{n.sign} #{n.string}"
-    # end)
-    # |> Enum.join(" - ")
-    # |> IO.inspect()
-
-    cond do
-      # closed?(l) ->
-      # true
-
-      #     unexpandable?(l) ->
-      #       false
-
-      atom?(h) ->
-        # (t ++ [h]) |> closes?()
-        false
-
-      alpha?(h) ->
-        nodes = expand_alpha(h)
-
-        expand_and_cleanup(t, nodes) |> closes?()
-
-      beta?(h) ->
-        {n1, n2} = expand_beta(h)
-
-        closes?(expand_and_cleanup(t, [n1])) &&
-          closes?(expand_and_cleanup(t, [n2]))
-
-      true ->
-        raise "unknown case"
-    end
   end
 
   def expand_alpha(n) do
@@ -100,12 +82,9 @@ defmodule TableauxSimplified do
 
   def expand_beta(n) do
     %{expanded_nodes: [n1, n2]} = TableauxRules.get_rule_expansion(n, 0)
+    # IO.inspect("#{n1.sign} #{n1.string} /\\ #{n2.sign} #{n2.string}")
     {n1, n2}
   end
-
-  # def unexpandable?(l) do
-  #   Enum.all?(l, fn n -> TableauxRules.get_rule_type(n.sign, n.expression) == :atom end)
-  # end
 
   def closed?(l) do
     RuleExpansion.closed_path?(l)
@@ -138,11 +117,15 @@ defmodule TableauxSimplified do
     end
   end
 
-  def cleanup(l) do
-    Enum.uniq_by(l, fn el -> "#{el.sign} #{el.string}" end)
-  end
-
   def sort(l) do
     TableauxRules.sort_queue(l)
+  end
+
+  def to_counterproof(l) do
+    l
+    |> Enum.map(fn
+      %{sign: :T, expression: expr} -> {expr, true}
+      %{sign: :F, expression: expr} -> {expr, false}
+    end)
   end
 end

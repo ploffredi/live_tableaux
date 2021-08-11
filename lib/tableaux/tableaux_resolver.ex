@@ -2,8 +2,19 @@ defmodule TableauxResolver do
   defmacro __using__(_) do
     quote do
       @behaviour TableauxResolver
+
+      def get_status(%TableauxResolver{status: status}), do: status
+      defoverridable get_status: 1
     end
   end
 
-  @callback is_valid?(binary()) :: boolean()
+  @type t :: %__MODULE__{
+          status: :open | :closed,
+          counterproof: [{atom(), boolean()}]
+        }
+  defstruct [:status, :counterproof]
+
+  @callback prove(binary()) :: any()
+
+  @callback get_status(TableauxResolver.t()) :: :open | :closed
 end
