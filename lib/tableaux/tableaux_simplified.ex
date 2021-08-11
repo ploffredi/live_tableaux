@@ -8,7 +8,7 @@ defmodule TableauxSimplified do
   Documentation for `Simplified Tableaux`.
   """
   def is_valid?(sequent) do
-    TableauxSimplified.get_status(prove(sequent)) == :closed
+    get_status(prove(sequent)) == :closed
   end
 
   defp get_simple_propositions(nodes) do
