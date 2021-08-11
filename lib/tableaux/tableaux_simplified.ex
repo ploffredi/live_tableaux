@@ -4,16 +4,8 @@ defmodule TableauxSimplified do
   @moduledoc """
   Documentation for `Simplified Tableaux`.
   """
-
   def is_valid?(sequent) do
-    parse =
-      SequentParser.parse(sequent)
-      |> sort()
-
-    case closed?(parse) do
-      true -> %{status: :closed, counterproof: nil}
-      false -> closes_tr?([parse], %{status: :closed, counterproof: to_counterproof(parse)})
-    end
+    TableauxSimplified.get_status(prove(sequent)) == :closed
   end
 
   defp get_atoms(nodes) do
