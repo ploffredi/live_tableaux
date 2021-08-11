@@ -66,4 +66,25 @@ defmodule Expressions do
   def expression_to_string({:implication, left, right}) do
     "(#{expression_to_string(left)})→(#{expression_to_string(right)})"
   end
+
+  def expression_to_atom_list(nil) do
+    []
+  end
+
+  def expression_to_atom_list(atom) when is_atom(atom) do
+    [atom]
+  end
+
+  def expression_to_atom_list({:negation, negated}) when is_atom(negated) do
+    [negated]
+  end
+
+  def expression_to_atom_list({:negation, negated}) do
+    expression_to_atom_list(negated)
+  end
+
+  def expression_to_atom_list({_, left, right}) do
+    [expression_to_atom_list(left), expression_to_atom_list(right)]
+    |> Enum.flat_map(& &1)
+  end
 end

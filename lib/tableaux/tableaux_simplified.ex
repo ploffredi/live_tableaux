@@ -16,20 +16,29 @@ defmodule TableauxSimplified do
     end
   end
 
+  defp get_atoms(nodes) do
+    nodes
+    |> Enum.flat_map(fn n -> Expressions.expression_to_atom_list(n.expression) end)
+    |> Enum.uniq()
+  end
+
   @impl true
   def prove(sequent) do
     parse =
       SequentParser.parse(sequent)
       |> sort()
 
+    atoms = get_atoms(parse)
+
     case closed?(parse) do
       true ->
-        %TableauxResolver{status: :closed, counterproof: nil}
+        %TableauxResolver{status: :closed, counterproof: nil, atoms: atoms}
 
       false ->
         closes_tr?([parse], %TableauxResolver{
           status: :closed,
-          counterproof: to_counterproof(parse)
+          counterproof: to_counterproof(parse),
+          atoms: atoms
         })
     end
   end
@@ -38,21 +47,32 @@ defmodule TableauxSimplified do
     result
   end
 
-  def closes_tr?(_, %{status: :open, counterproof: _} = result) do
-    result
+  def closes_tr?(
+        _,
+        %TableauxResolver{status: :open, counterproof: counterproof, atoms: atoms} = result
+      ) do
+    irrelevant_proofs =
+      atoms
+      |> Enum.filter(fn atom -> !Enum.any?(counterproof, fn {cp, _} -> cp == atom end) end)
+      |> Enum.map(fn a -> {a, true} end)
+
+    %TableauxResolver{
+      result
+      | counterproof: counterproof ++ irrelevant_proofs
+    }
   end
 
   def closes_tr?([[] | qt], result) do
     closes_tr?(qt, result)
   end
 
-  def closes_tr?([qh | qt], result) do
+  def closes_tr?([qh | qt], %TableauxResolver{atoms: atoms} = result) do
     [h | t] = qh
 
     {r, list} =
       cond do
         atom?(h) ->
-          {%TableauxResolver{status: :open, counterproof: to_counterproof(qh)}, []}
+          {%TableauxResolver{status: :open, counterproof: to_counterproof(qh), atoms: atoms}, []}
 
         alpha?(h) ->
           nodes = expand_alpha(h)
