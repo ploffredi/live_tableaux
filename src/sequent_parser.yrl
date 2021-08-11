@@ -28,11 +28,11 @@ sequent -> assertion descendant : map_index('$2',1).
 sequent -> ascendants assertion descendant : map_index('$1' ++ '$3',1).
 
 
-descendant -> elems : ['Elixir.TableauxNode':'__struct__'(#{expression => '$1', step => 0, source => 0, sign => 'F', string => 'Elixir.Expressions':expression_to_string('$1')})].
+descendant -> elems : ['Elixir.TableauxNode':'__struct__'(#{expression => '$1', step => 0, source => 0, sign => 'F', string => 'Elixir.Expressions':to_string_representation('$1')})].
 
 ascendants -> ascendant : ['$1'].
 ascendants -> ascendant separator ascendants : ['$1'|'$3'].
-ascendant -> elems : 'Elixir.TableauxNode':'__struct__'(#{expression => '$1', step => 0, source => 0, sign => 'T', string => 'Elixir.Expressions':expression_to_string('$1')}).
+ascendant -> elems : 'Elixir.TableauxNode':'__struct__'(#{expression => '$1', step => 0, source => 0, sign => 'T', string => 'Elixir.Expressions':to_string_representation('$1')}).
 
 neg -> negation elems :  {extract_token('$1'), '$2'}.   
 

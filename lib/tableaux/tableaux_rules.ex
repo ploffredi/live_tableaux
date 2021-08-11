@@ -93,7 +93,7 @@ defmodule TableauxRules do
         |> Enum.map(fn {s, {e, c}} ->
           %TableauxNode{
             sign: s,
-            string: Expressions.expression_to_string(e),
+            string: Expressions.to_string_representation(e),
             expression: e,
             source: nid,
             nid: c
@@ -120,7 +120,7 @@ defmodule TableauxRules do
         |> Enum.map(fn {s, {e, c}} ->
           %TableauxNode{
             sign: s,
-            string: Expressions.expression_to_string(e),
+            string: Expressions.to_string_representation(e),
             expression: e,
             source: nid,
             nid: c

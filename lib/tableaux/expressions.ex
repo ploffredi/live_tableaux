@@ -6,85 +6,88 @@ defmodule Expressions do
           | {:disjunction, atom | expr(), atom | expr()}
           | {:implication, atom | expr(), atom | expr()}
 
-  @spec expression_to_string(expr()) :: binary
-  def expression_to_string(atom) when is_atom(atom) do
+  @spec to_string_representation(expr()) :: binary
+  def to_string_representation(atom) when is_atom(atom) do
     "#{atom}"
   end
 
-  def expression_to_string({:negation, negated}) when is_atom(negated) do
-    "¬#{expression_to_string(negated)}"
+  def to_string_representation({:negation, negated}) when is_atom(negated) do
+    "¬#{to_string_representation(negated)}"
   end
 
-  def expression_to_string({:negation, negated}) do
-    "¬(#{expression_to_string(negated)})"
+  def to_string_representation({:negation, negated}) do
+    "¬(#{to_string_representation(negated)})"
   end
 
-  def expression_to_string({:conjunction, left, right}) when is_atom(left) and is_atom(right) do
-    "#{expression_to_string(left)}∧#{expression_to_string(right)}"
+  def to_string_representation({:conjunction, left, right})
+      when is_atom(left) and is_atom(right) do
+    "#{to_string_representation(left)}∧#{to_string_representation(right)}"
   end
 
-  def expression_to_string({:conjunction, left, right}) when is_atom(left) do
-    "#{expression_to_string(left)}∧(#{expression_to_string(right)})"
+  def to_string_representation({:conjunction, left, right}) when is_atom(left) do
+    "#{to_string_representation(left)}∧(#{to_string_representation(right)})"
   end
 
-  def expression_to_string({:conjunction, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})∧#{expression_to_string(right)}"
+  def to_string_representation({:conjunction, left, right}) when is_atom(right) do
+    "(#{to_string_representation(left)})∧#{to_string_representation(right)}"
   end
 
-  def expression_to_string({:conjunction, left, right}) do
-    "(#{expression_to_string(left)})∧(#{expression_to_string(right)})"
+  def to_string_representation({:conjunction, left, right}) do
+    "(#{to_string_representation(left)})∧(#{to_string_representation(right)})"
   end
 
-  def expression_to_string({:disjunction, left, right}) when is_atom(left) and is_atom(right) do
-    "#{expression_to_string(left)}∨#{expression_to_string(right)}"
+  def to_string_representation({:disjunction, left, right})
+      when is_atom(left) and is_atom(right) do
+    "#{to_string_representation(left)}∨#{to_string_representation(right)}"
   end
 
-  def expression_to_string({:disjunction, left, right}) when is_atom(left) do
-    "#{expression_to_string(left)}∨(#{expression_to_string(right)})"
+  def to_string_representation({:disjunction, left, right}) when is_atom(left) do
+    "#{to_string_representation(left)}∨(#{to_string_representation(right)})"
   end
 
-  def expression_to_string({:disjunction, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})∨#{expression_to_string(right)}"
+  def to_string_representation({:disjunction, left, right}) when is_atom(right) do
+    "(#{to_string_representation(left)})∨#{to_string_representation(right)}"
   end
 
-  def expression_to_string({:disjunction, left, right}) do
-    "(#{expression_to_string(left)})∨(#{expression_to_string(right)})"
+  def to_string_representation({:disjunction, left, right}) do
+    "(#{to_string_representation(left)})∨(#{to_string_representation(right)})"
   end
 
-  def expression_to_string({:implication, left, right}) when is_atom(left) and is_atom(right) do
-    "#{expression_to_string(left)}→#{expression_to_string(right)}"
+  def to_string_representation({:implication, left, right})
+      when is_atom(left) and is_atom(right) do
+    "#{to_string_representation(left)}→#{to_string_representation(right)}"
   end
 
-  def expression_to_string({:implication, left, right}) when is_atom(left) do
-    "#{expression_to_string(left)}→(#{expression_to_string(right)})"
+  def to_string_representation({:implication, left, right}) when is_atom(left) do
+    "#{to_string_representation(left)}→(#{to_string_representation(right)})"
   end
 
-  def expression_to_string({:implication, left, right}) when is_atom(right) do
-    "(#{expression_to_string(left)})→#{expression_to_string(right)}"
+  def to_string_representation({:implication, left, right}) when is_atom(right) do
+    "(#{to_string_representation(left)})→#{to_string_representation(right)}"
   end
 
-  def expression_to_string({:implication, left, right}) do
-    "(#{expression_to_string(left)})→(#{expression_to_string(right)})"
+  def to_string_representation({:implication, left, right}) do
+    "(#{to_string_representation(left)})→(#{to_string_representation(right)})"
   end
 
-  def expression_to_atom_list(nil) do
+  def to_simple_propositions(nil) do
     []
   end
 
-  def expression_to_atom_list(atom) when is_atom(atom) do
+  def to_simple_propositions(atom) when is_atom(atom) do
     [atom]
   end
 
-  def expression_to_atom_list({:negation, negated}) when is_atom(negated) do
+  def to_simple_propositions({:negation, negated}) when is_atom(negated) do
     [negated]
   end
 
-  def expression_to_atom_list({:negation, negated}) do
-    expression_to_atom_list(negated)
+  def to_simple_propositions({:negation, negated}) do
+    to_simple_propositions(negated)
   end
 
-  def expression_to_atom_list({_, left, right}) do
-    [expression_to_atom_list(left), expression_to_atom_list(right)]
+  def to_simple_propositions({_, left, right}) do
+    [to_simple_propositions(left), to_simple_propositions(right)]
     |> Enum.flat_map(& &1)
   end
 end

@@ -8,9 +8,9 @@ defmodule TableauxSimplified do
     TableauxSimplified.get_status(prove(sequent)) == :closed
   end
 
-  defp get_atoms(nodes) do
+  defp get_simple_propositions(nodes) do
     nodes
-    |> Enum.flat_map(fn n -> Expressions.expression_to_atom_list(n.expression) end)
+    |> Enum.flat_map(fn n -> Expressions.to_simple_propositions(n.expression) end)
     |> Enum.uniq()
   end
 
@@ -20,17 +20,21 @@ defmodule TableauxSimplified do
       SequentParser.parse(sequent)
       |> sort()
 
-    atoms = get_atoms(parse)
+    simple_propositions = get_simple_propositions(parse)
 
     case closed?(parse) do
       true ->
-        %TableauxResolver{status: :closed, counterproof: nil, atoms: atoms}
+        %TableauxResolver{
+          status: :closed,
+          counterproof: nil,
+          simple_propositions: simple_propositions
+        }
 
       false ->
         closes_tr?([parse], %TableauxResolver{
           status: :closed,
           counterproof: to_counterproof(parse),
-          atoms: atoms
+          simple_propositions: simple_propositions
         })
     end
   end
@@ -41,10 +45,14 @@ defmodule TableauxSimplified do
 
   def closes_tr?(
         _,
-        %TableauxResolver{status: :open, counterproof: counterproof, atoms: atoms} = result
+        %TableauxResolver{
+          status: :open,
+          counterproof: counterproof,
+          simple_propositions: simple_propositions
+        } = result
       ) do
     irrelevant_proofs =
-      atoms
+      simple_propositions
       |> Enum.filter(fn atom -> !Enum.any?(counterproof, fn {cp, _} -> cp == atom end) end)
       |> Enum.map(fn a -> {a, true} end)
 
@@ -58,13 +66,17 @@ defmodule TableauxSimplified do
     closes_tr?(qt, result)
   end
 
-  def closes_tr?([qh | qt], %TableauxResolver{atoms: atoms} = result) do
+  def closes_tr?([qh | qt], %TableauxResolver{simple_propositions: simple_propositions} = result) do
     [h | t] = qh
 
     {r, list} =
       cond do
-        atom?(h) ->
-          {%TableauxResolver{status: :open, counterproof: to_counterproof(qh), atoms: atoms}, []}
+        simple_proposition?(h) ->
+          {%TableauxResolver{
+             status: :open,
+             counterproof: to_counterproof(qh),
+             simple_propositions: simple_propositions
+           }, []}
 
         alpha?(h) ->
           nodes = expand_alpha(h)
@@ -102,7 +114,7 @@ defmodule TableauxSimplified do
     RuleExpansion.closed_path?(l)
   end
 
-  def atom?(n) do
+  def simple_proposition?(n) do
     TableauxRules.get_rule_type(n.sign, n.expression) == :atom
   end
 

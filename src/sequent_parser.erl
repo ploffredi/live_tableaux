@@ -450,7 +450,7 @@ yeccpars2_2_(__Stack0) ->
 yeccpars2_3_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-                     'Elixir.TableauxNode':'__struct__'(#{expression => ___1, step => 0, source => 0, sign => 'T', string => 'Elixir.Expressions':expression_to_string(___1)})
+                     'Elixir.TableauxNode':'__struct__'(#{expression => ___1, step => 0, source => 0, sign => 'T', string => 'Elixir.Expressions':to_string_representation(___1)})
   end | __Stack].
 
 -compile({inline,yeccpars2_5_/1}).
@@ -506,7 +506,7 @@ yeccpars2_16_(__Stack0) ->
 yeccpars2_17_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-                      ['Elixir.TableauxNode':'__struct__'(#{expression => ___1, step => 0, source => 0, sign => 'F', string => 'Elixir.Expressions':expression_to_string(___1)})]
+                      ['Elixir.TableauxNode':'__struct__'(#{expression => ___1, step => 0, source => 0, sign => 'F', string => 'Elixir.Expressions':to_string_representation(___1)})]
   end | __Stack].
 
 -compile({inline,yeccpars2_18_/1}).

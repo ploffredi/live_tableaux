@@ -11,9 +11,9 @@ defmodule TableauxResolver do
   @type t :: %__MODULE__{
           status: :open | :closed,
           counterproof: [{atom(), boolean()}],
-          atoms: [atom()]
+          simple_propositions: [atom()]
         }
-  defstruct [:status, :counterproof, :atoms]
+  defstruct [:status, :counterproof, :simple_propositions]
 
   @callback prove(binary()) :: any()
 
