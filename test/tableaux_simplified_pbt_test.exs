@@ -1,9 +1,9 @@
 defmodule TableauxSimplifiedPbtTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   use PropCheck
 
   alias Tableaux, as: TReference
-  alias Luis.Tableaux, as: TImpl
+  alias TableauxSimplified, as: TImpl
 
   @numtests 200
   @max_size 30

@@ -1,5 +1,5 @@
 defmodule TableauxTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   doctest Tableaux
 

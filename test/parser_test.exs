@@ -1,5 +1,5 @@
 defmodule ParserTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   test "parses a simple sequent" do
     assert Tableaux.parse_sequent("p->q,p|-q") == [
