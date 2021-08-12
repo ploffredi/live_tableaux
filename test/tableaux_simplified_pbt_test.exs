@@ -3,10 +3,10 @@ defmodule TableauxSimplifiedPbtTest do
   use PropCheck
 
   alias Tableaux, as: TReference
-  alias TableauxSimplified, as: TImpl
+  alias Luis.Tableaux, as: TImpl
 
-  @numtests 200
-  @max_size 30
+  @numtests 100
+  @max_size 20
   @negation " ¬ "
   @conjunction " ∧ "
   @disjunction " ∨ "

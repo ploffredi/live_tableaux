@@ -2,7 +2,7 @@ defmodule TableauxPbtTest do
   use ExUnit.Case, async: false
   use PropCheck
 
-  alias Tableaux, as: Tableaux
+  alias Luis.Tableaux, as: Tableaux
 
   @numtests 100
   @negation " ¬ "
