@@ -150,7 +150,8 @@ defmodule TableauxSimplified do
             l
             |> Enum.concat(to_append)
             |> sort()
-            |> Enum.uniq_by(fn el -> "#{el.sign} #{el.string}" end)
+
+            #  |> Enum.uniq_by(fn el -> "#{el.sign} #{el.string}" end)
         end
       end
     end
@@ -162,6 +163,10 @@ defmodule TableauxSimplified do
 
   def to_counterproof(l) do
     l
+    |> Enum.filter(fn
+      %{sign: _, expression: expr} when is_atom(expr) -> true
+      _ -> false
+    end)
     |> Enum.map(fn
       %{sign: :T, expression: expr} -> {expr, true}
       %{sign: :F, expression: expr} -> {expr, false}
