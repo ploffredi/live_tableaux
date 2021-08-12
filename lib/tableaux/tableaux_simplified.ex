@@ -15,10 +15,11 @@ defmodule TableauxSimplified do
     nodes
     |> Enum.flat_map(fn n -> Expressions.to_simple_propositions(n.expression) end)
     |> Enum.uniq()
+
   end
 
   @impl true
-  def prove(sequent) do
+  def prove(sequent) do 
     parse =
       SequentParser.parse(sequent)
       |> sort()
