@@ -136,10 +136,22 @@ defmodule TableauxSimplified do
       if Enum.any?(to_append, fn n -> closes_path?(n, l) end) do
         []
       else
-        l
-        |> Enum.concat(to_append)
-        |> sort()
-        |> Enum.uniq_by(fn el -> "#{el.sign} #{el.string}" end)
+        to_append =
+          to_append
+          |> Enum.filter(fn el_a ->
+            !Enum.any?(l, fn el_l -> el_l.sign == el_a.sign && el_l.string == el_a.string end)
+          end)
+
+        case to_append do
+          [] ->
+            l
+
+          _ ->
+            l
+            |> Enum.concat(to_append)
+            |> sort()
+            |> Enum.uniq_by(fn el -> "#{el.sign} #{el.string}" end)
+        end
       end
     end
   end
