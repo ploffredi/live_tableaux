@@ -2,6 +2,8 @@ defmodule TableauxPbtTest do
   use ExUnit.Case, async: true
   use PropCheck
 
+  alias Tableaux, as: Tableaux
+
   @numtests 100
   @negation " ¬ "
   @conjunction " ∧ "
@@ -12,7 +14,7 @@ defmodule TableauxPbtTest do
   property "a simple proposition is not verifiable" do
     forall p <- simple_proposition() do
       # collect(
-      not Tableaux.is_valid?(@assertion <> p)
+      not Tableaux.prove(@assertion <> p)
       #  p
       # )
     end
@@ -24,7 +26,7 @@ defmodule TableauxPbtTest do
   ] do
     forall p <- proposition() do
       # collect(
-      Tableaux.is_valid?(
+      Tableaux.prove(
         @assertion <> "(" <> p <> ")" <> @disjunction <> "(" <> @negation <> "(" <> p <> "))"
       )
 
@@ -37,13 +39,13 @@ defmodule TableauxPbtTest do
   property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify",
            [:verbose, numtests: @numtests] do
     forall p <- proposition() do
-      Tableaux.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
+      Tableaux.prove("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
     end
   end
 
   property "a proposition always implies itself", [:verbose, numtests: @numtests] do
     forall p <- proposition() do
-      Tableaux.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
+      Tableaux.prove(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
     end
   end
 

@@ -19,6 +19,10 @@ defmodule TableauxSimplified do
 
   @impl true
   def prove(sequent) do
+    get_status(prove3(sequent)) == :closed
+  end
+
+  def prove3(sequent) do
     parse =
       SequentParser.parse(sequent)
       |> sort()

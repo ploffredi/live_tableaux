@@ -3,9 +3,9 @@ defmodule TableauxSimplifiedPbtTest do
   use PropCheck
 
   alias Tableaux, as: TReference
-  alias TableauxSimplified, as: TImpl
+  alias Luis.Tableaux, as: TImpl
 
-  @numtests 1000
+  @numtests 200
   @max_size 30
   @negation " ¬ "
   @conjunction " ∧ "
@@ -16,7 +16,7 @@ defmodule TableauxSimplifiedPbtTest do
   property "a simple proposition is not verifiable" do
     forall p <- simple_proposition() do
       # collect(
-      not TImpl.is_valid?(@assertion <> p)
+      not TImpl.prove(@assertion <> p)
       #  p
       # )
     end
@@ -29,7 +29,7 @@ defmodule TableauxSimplifiedPbtTest do
     forall p <- proposition() do
       # IO.inspect(@assertion <> "(" <> p <> ")"<> @disjunction <>  "(" <> @negation <> "(" <> p <> "))", label: "sequent")
       # collect(
-      TImpl.is_valid?(
+      TImpl.prove(
         @assertion <> "(" <> p <> ")" <> @disjunction <> "(" <> @negation <> "(" <> p <> "))"
       )
 
@@ -42,15 +42,15 @@ defmodule TableauxSimplifiedPbtTest do
   property "if a the ascendant and the consequence of a sequent are the same proposition the sequent should verify",
            [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
-      TImpl.is_valid?("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
+      TImpl.prove("(" <> p <> ")" <> @assertion <> "(" <> p <> ")")
     end
   end
 
   property "the results must be consistent with the the bintree based implementation",
            [:verbose, numtests: @numtests, max_size: @max_size] do
     forall p <- proposition() do
-      TImpl.is_valid?(@assertion <> "(" <> p <> ")") ==
-        TReference.is_valid?(@assertion <> "(" <> p <> ")")
+      TImpl.prove(@assertion <> "(" <> p <> ")") ==
+        TReference.prove(@assertion <> "(" <> p <> ")")
     end
   end
 
@@ -60,36 +60,36 @@ defmodule TableauxSimplifiedPbtTest do
     max_size: @max_size
   ] do
     forall p <- proposition() do
-      TImpl.is_valid?(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
+      TImpl.prove(@assertion <> "(" <> p <> ")" <> @implication <> "(" <> p <> ")")
     end
   end
 
   property "commutative laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
-      TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> b <> ")") ==
-        TImpl.is_valid?(@assertion <> "(" <> b <> ")" <> @conjunction <> "(" <> a <> ")") &&
-        TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> b <> ")") ==
-          TImpl.is_valid?(@assertion <> "(" <> b <> ")" <> @disjunction <> "(" <> a <> ")")
+      TImpl.prove(@assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> b <> ")") ==
+        TImpl.prove(@assertion <> "(" <> b <> ")" <> @conjunction <> "(" <> a <> ")") &&
+        TImpl.prove(@assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> b <> ")") ==
+          TImpl.prove(@assertion <> "(" <> b <> ")" <> @disjunction <> "(" <> a <> ")")
     end
   end
 
   property "associative laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b, c] <- [proposition(), proposition(), proposition()] do
-      TImpl.is_valid?(
+      TImpl.prove(
         @assertion <>
           "((" <> a <> ")" <> @disjunction <> "(" <> b <> "))" <> @disjunction <> "(" <> c <> ")"
       ) ==
-        TImpl.is_valid?(
+        TImpl.prove(
           @assertion <>
             "(" <>
             a <> ")" <> @disjunction <> "((" <> b <> ")" <> @disjunction <> "(" <> c <> "))"
         ) &&
-        TImpl.is_valid?(
+        TImpl.prove(
           @assertion <>
             "((" <>
             a <> ")" <> @conjunction <> "(" <> b <> "))" <> @conjunction <> "(" <> c <> ")"
         ) ==
-          TImpl.is_valid?(
+          TImpl.prove(
             @assertion <>
               "(" <>
               a <> ")" <> @conjunction <> "((" <> b <> ")" <> @conjunction <> "(" <> c <> "))"
@@ -99,11 +99,11 @@ defmodule TableauxSimplifiedPbtTest do
 
   property "distributive laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b, c] <- [proposition(), proposition(), proposition()] do
-      TImpl.is_valid?(
+      TImpl.prove(
         @assertion <>
           "(" <> a <> ")" <> @conjunction <> "((" <> b <> ")" <> @disjunction <> "(" <> c <> "))"
       ) ==
-        TImpl.is_valid?(
+        TImpl.prove(
           @assertion <>
             "((" <>
             a <>
@@ -112,12 +112,12 @@ defmodule TableauxSimplifiedPbtTest do
             "(" <>
             b <> "))" <> @disjunction <> "((" <> a <> ")" <> @conjunction <> "(" <> c <> "))"
         ) &&
-        TImpl.is_valid?(
+        TImpl.prove(
           @assertion <>
             "(" <>
             a <> ")" <> @disjunction <> "((" <> b <> ")" <> @conjunction <> "(" <> c <> "))"
         ) ==
-          TImpl.is_valid?(
+          TImpl.prove(
             @assertion <>
               "((" <>
               a <>
@@ -131,43 +131,43 @@ defmodule TableauxSimplifiedPbtTest do
 
   property "absorption laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
-      TImpl.is_valid?(
+      TImpl.prove(
         @assertion <>
           "(" <> a <> ")" <> @conjunction <> "((" <> a <> ")" <> @disjunction <> "(" <> b <> "))"
       ) ==
-        TImpl.is_valid?(@assertion <> "(" <> a <> ")") &&
-        TImpl.is_valid?(
+        TImpl.prove(@assertion <> "(" <> a <> ")") &&
+        TImpl.prove(
           @assertion <>
             "(" <>
             a <> ")" <> @disjunction <> "((" <> a <> ")" <> @conjunction <> "(" <> b <> "))"
         ) ==
-          TImpl.is_valid?(@assertion <> "(" <> a <> ")")
+          TImpl.prove(@assertion <> "(" <> a <> ")")
     end
   end
 
   property "idempotent laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall a <- proposition() do
-      TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> a <> ")") ==
-        TImpl.is_valid?(@assertion <> "(" <> a <> ")") &&
-        TImpl.is_valid?(@assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> a <> ")") ==
-          TImpl.is_valid?(@assertion <> "(" <> a <> ")")
+      TImpl.prove(@assertion <> "(" <> a <> ")" <> @conjunction <> "(" <> a <> ")") ==
+        TImpl.prove(@assertion <> "(" <> a <> ")") &&
+        TImpl.prove(@assertion <> "(" <> a <> ")" <> @disjunction <> "(" <> a <> ")") ==
+          TImpl.prove(@assertion <> "(" <> a <> ")")
     end
   end
 
   property "De Morgan's laws", [:verbose, numtests: @numtests, max_size: @max_size] do
     forall [a, b] <- [proposition(), proposition()] do
-      TImpl.is_valid?(
+      TImpl.prove(
         @assertion <> "(" <> @negation <> "((" <> a <> ")" <> @conjunction <> "(" <> b <> ")))"
       ) ==
-        TImpl.is_valid?(
+        TImpl.prove(
           @assertion <>
             "(" <>
             @negation <> "(" <> a <> "))" <> @disjunction <> "(" <> @negation <> "(" <> b <> "))"
         ) &&
-        TImpl.is_valid?(
+        TImpl.prove(
           @assertion <> "(" <> @negation <> "((" <> a <> ")" <> @disjunction <> "(" <> b <> ")))"
         ) ==
-          TImpl.is_valid?(
+          TImpl.prove(
             @assertion <>
               "(" <>
               @negation <>

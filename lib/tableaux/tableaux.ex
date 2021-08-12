@@ -12,6 +12,12 @@ defmodule Tableaux do
     |> is_closed()
   end
 
+  def prove(sequent) do
+    sequent
+    |> expand_sequent()
+    |> is_closed()
+  end
+
   def is_valid?(sequent) do
     sequent
     |> expand_sequent()
