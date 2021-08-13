@@ -25,6 +25,29 @@
         <% end %>
       </select>
 </form>
-      <button style="background-color:white;color:blue;padding:5px;padding-top:0px;margin:2px" phx-click="toggle_gen_info">Toggle generation informations</button>
+    
+      <%= if Enum.count(@counterproof)>0 do %>
+          <table style="font-size: small;  width:100%; border: 1px solid skyblue;">
+            <caption style="font-size: large; font-weight: bolder;">Counterproof</caption>
+            <tr style="background-color: skyblue;">
+              <th style="padding: 5px;">Proposition</th>
+
+              <th style="padding: 5px;">Value</th> 
+            </tr>
+            <%= for {atom, value} <- @counterproof do %>
+            <tr>
+              <td style="background-color: lightgray; padding: 5px;"><%= atom %></td>
+              <td style="padding: 5px;"><%= value %></td> 
+            </tr>
+            <% end %>
+          </table>  
+      <% end %>    
  <div id="d3-result" phx-hook="D3Tree" phx-update="ignore">
+  <div>
+        <button style="background-color:white;color:blue;padding:5px;padding-top:0px;margin:2px" phx-click="toggle_gen_info">Toggle info</button>
+  </div>
+
+
 </section>
+
+        
