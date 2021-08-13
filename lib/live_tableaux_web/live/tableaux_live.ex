@@ -5,7 +5,8 @@ defmodule LiveTableauxWeb.TableauxLive do
     "p|q,q|-q",
     "p|q,q|-!q",
     "|-(p∨(q∧r))→((p∨q)∧(p∨r))",
-    "p∨q|-(p∨(q∧r))→((p∨q)∧(p∨r))"
+    "p∨q|-(p∨(q∧r))→((p∨q)∧(p∨r))",
+    "|-(p∨(q∧r))→¬((p∨q)∧(p∨r))"
   ]
   @impl true
   def mount(_params, _session, socket) do
