@@ -42,18 +42,18 @@ defmodule TableauxSimplified do
     end
   end
 
-  def closes_tr?([], result) do
+  defp closes_tr?([], result) do
     result
   end
 
-  def closes_tr?(
-        _,
-        %TableauxResolver{
-          status: :open,
-          counterproof: counterproof,
-          simple_propositions: simple_propositions
-        } = result
-      ) do
+  defp closes_tr?(
+         _,
+         %TableauxResolver{
+           status: :open,
+           counterproof: counterproof,
+           simple_propositions: simple_propositions
+         } = result
+       ) do
     irrelevant_proofs =
       simple_propositions
       |> Enum.filter(fn atom -> !Enum.any?(counterproof, fn {cp, _} -> cp == atom end) end)
@@ -65,11 +65,11 @@ defmodule TableauxSimplified do
     }
   end
 
-  def closes_tr?([[] | qt], result) do
+  defp closes_tr?([[] | qt], result) do
     closes_tr?(qt, result)
   end
 
-  def closes_tr?([qh | qt], %TableauxResolver{simple_propositions: simple_propositions} = result) do
+  defp closes_tr?([qh | qt], %TableauxResolver{simple_propositions: simple_propositions} = result) do
     [h | t] = qh
 
     {r, list} =
@@ -102,34 +102,34 @@ defmodule TableauxSimplified do
     closes_tr?(Enum.concat(list, qt), r)
   end
 
-  def expand_alpha(n) do
+  defp expand_alpha(n) do
     %{expanded_nodes: expanded_nodes} = get_rule_expansion(n, 0)
     expanded_nodes
   end
 
-  def expand_beta(n) do
+  defp expand_beta(n) do
     %{expanded_nodes: [n1, n2]} = get_rule_expansion(n, 0)
     # IO.inspect("#{n1.sign} #{n1.string} /\\ #{n2.sign} #{n2.string}")
     {n1, n2}
   end
 
-  def closed?(l) do
+  defp closed?(l) do
     closed_path?(l)
   end
 
-  def simple_proposition?(n) do
+  defp simple_proposition?(n) do
     get_rule_type(n.sign, n.expression) == :atom
   end
 
-  def alpha?(n) do
+  defp alpha?(n) do
     get_rule_type(n.sign, n.expression) == :alpha
   end
 
-  def beta?(n) do
+  defp beta?(n) do
     get_rule_type(n.sign, n.expression) == :beta
   end
 
-  def expand_and_cleanup(l, to_append) do
+  defp expand_and_cleanup(l, to_append) do
     cond do
       closed?(to_append) ->
         []
@@ -156,11 +156,11 @@ defmodule TableauxSimplified do
     end
   end
 
-  def sort(l) do
+  defp sort(l) do
     sort_queue(l)
   end
 
-  def to_counterproof(l) do
+  defp to_counterproof(l) do
     l
     |> Enum.filter(fn
       %{sign: _, expression: expr} when is_atom(expr) -> true
