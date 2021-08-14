@@ -15,11 +15,10 @@ defmodule TableauxSimplified do
     nodes
     |> Enum.flat_map(fn n -> Expressions.to_simple_propositions(n.expression) end)
     |> Enum.uniq()
-
   end
 
   @impl true
-  def prove(sequent) do 
+  def prove(sequent) do
     parse =
       SequentParser.parse(sequent)
       |> sort()
@@ -131,12 +130,14 @@ defmodule TableauxSimplified do
   end
 
   def expand_and_cleanup(l, to_append) do
-    if closed?(to_append) do
-      []
-    else
-      if Enum.any?(to_append, fn n -> closes_path?(n, l) end) do
+    cond do
+      closed?(to_append) ->
         []
-      else
+
+      Enum.any?(to_append, fn n -> closes_path?(n, l) end) ->
+        []
+
+      true ->
         to_append =
           to_append
           |> Enum.filter(fn el_a ->
@@ -151,10 +152,7 @@ defmodule TableauxSimplified do
             l
             |> Enum.concat(to_append)
             |> sort()
-
-            #  |> Enum.uniq_by(fn el -> "#{el.sign} #{el.string}" end)
         end
-      end
     end
   end
 

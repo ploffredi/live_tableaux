@@ -5,16 +5,8 @@ defmodule Tableaux do
   Documentation for `Tableaux`.
   """
 
-  def verify(sequent) do
-    sequent
-    |> expand_sequent()
-    |> is_closed([])
-  end
-
   def is_valid?(sequent) do
-    sequent
-    |> expand_sequent()
-    |> is_closed([])
+    get_status(prove(sequent)) == :closed
   end
 
   @impl true
